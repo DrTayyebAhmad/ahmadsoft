@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Your App - Ahmad Soft</title>
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+  <header>
+    <h1><span>Ahmad Soft</span> - Submit Your App</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="submit-app.html">Submit App</a></li>
+        <li><a href="login.html">Manage Apps</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section id="submit-app">
+    <h2>Submit Your App</h2>
+    <form id="app-form">
+      <label for="app-name">App Name:</label>
+      <input type="text" id="app-name" name="app-name" required>
+
+      <label for="platform">Platform:</label>
+      <select id="platform" name="platform" required>
+        <option value="Android">Android</option>
+        <option value="iOS">iOS</option>
+      </select>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+
+        <label for="hyperlink">App Website/Link (Optional):</label>
+        <input type="url" id="hyperlink" name="hyperlink" placeholder="https://example.com">
+
+        <label for="screenshot">Screenshot URL:</label>
+      <input type="url" id="screenshot" name="screenshot" required>
+
+      <label for="rating">Rating:</label>
+      <input type="number" id="rating" name="rating" min="1" max="5" step="0.1" required>
+
+      <label for="app-file">Upload App File:</label>
+      <input type="file" id="app-file" name="app-file" accept=".apk,.ipa" required>
+
+      <button type="submit">Submit App</button>
+    </form>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 <span>Ahmad Soft</span>. All rights reserved.</p>
+  </footer>
+
+  <script src="scripts/form-handler.js"></script>
+</body>
+</html>
