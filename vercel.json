@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {
   "functions": {
     "api/upload.js": {
@@ -6,12 +5,3 @@
     }
   }
 }
-=======
-{
-  "functions": {
-    "api/upload.js": {
-      "maxBodySize": "55mb"
-    }
-  }
-}
->>>>>>> dfc7ab4 (Update upload endpoint and Vercel config)
