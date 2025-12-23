@@ -85,7 +85,7 @@ async function uploadFile(file) {
   const stored = typeof window !== "undefined" ? localStorage.getItem("uploadEndpoint") : null;
   const endpoint = (typeof window !== "undefined" && (window.UPLOAD_ENDPOINT || stored))
     ? (window.UPLOAD_ENDPOINT || stored)
-    : "http://localhost:3000/upload";
+    : "/api/upload";
 
   if (window.location && window.location.protocol === "https:" && endpoint.startsWith("http://")) {
     throw new Error("Uploads require HTTPS endpoint when site is served over HTTPS.");
