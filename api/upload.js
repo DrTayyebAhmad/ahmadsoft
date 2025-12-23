@@ -1,7 +1,12 @@
-const { put } = require('@vercel/blob');
-const Busboy = require('busboy');
+import { put } from '@vercel/blob';
 
-module.exports = async function (req, res) {
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -13,7 +18,8 @@ module.exports = async function (req, res) {
       return res.status(400).json({ error: 'Expected multipart/form-data' });
     }
 
-    const bb = new Busboy({ headers: req.headers });
+    const busboy = await import('busboy').then(m => m.default || m);
+    const bb = busboy({ headers: req.headers });
 
     let fileUploadPromise = null;
 
