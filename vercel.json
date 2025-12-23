@@ -1,7 +1,5 @@
 {
   "functions": {
-    "api/upload.js": {
-      "maxBodySize": "55mb"
-    }
+    "api/upload.js": {}
   }
 }
