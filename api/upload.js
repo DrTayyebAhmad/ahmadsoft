@@ -4,7 +4,9 @@ import { Readable } from 'stream';
 export const config = {
   api: {
     bodyParser: false,
+    sizeLimit: '500mb',
   },
+  maxDuration: 60,
 };
 
 export default async function handler(req, res) {
