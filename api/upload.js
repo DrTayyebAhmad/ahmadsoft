@@ -1,4 +1,5 @@
 import { put } from '@vercel/blob';
+import { Readable } from 'stream';
 
 export const config = {
   api: {
@@ -19,7 +20,7 @@ export default async function handler(req, res) {
     }
 
     const busboy = await import('busboy').then(m => m.default || m);
-    const bb = busboy({ headers: req.headers });
+    const bb = busboy({ headers: req.headers, limits: { fileSize: 500 * 1024 * 1024 } });
 
     let fileUploadPromise = null;
 
@@ -29,21 +30,17 @@ export default async function handler(req, res) {
         file.resume();
         return;
       }
-
-      const chunks = [];
-      file.on('data', (d) => chunks.push(d));
       file.on('limit', () => {
         fileUploadPromise = Promise.reject(new Error('File too large'));
         file.resume();
       });
-      file.on('end', () => {
-        if (fileUploadPromise) return;
-        const buffer = Buffer.concat(chunks);
-        fileUploadPromise = put(`uploads/${Date.now()}-${filename}`, buffer, {
+      if (!fileUploadPromise) {
+        const stream = Readable.toWeb(file);
+        fileUploadPromise = put(`uploads/${Date.now()}-${filename}`, stream, {
           access: 'public',
           contentType: mimeType || 'application/octet-stream',
         });
-      });
+      }
     });
 
     bb.on('error', (err) => {
