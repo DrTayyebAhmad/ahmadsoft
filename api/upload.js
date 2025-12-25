@@ -1,26 +1,30 @@
 import { createUploadURL } from '@vercel/blob';
 
 export const config = {
-  api: {
-    bodyParser: false,
-    sizeLimit: '500mb',
-  },
-  maxDuration: 60,
+  runtime: 'edge',
 };
 
-export default async function handler(req, res) {
+export default async function handler(req) {
   if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
-    return res.status(405).json({ error: 'Method Not Allowed' });
+    return new Response(JSON.stringify({ error: 'Method Not Allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json', 'Allow': 'POST' },
+    });
   }
 
   try {
     const { url } = await createUploadURL({
       access: 'public',
     });
-    return res.status(200).json({ uploadUrl: url });
+    return new Response(JSON.stringify({ uploadUrl: url }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: err.message || 'Failed to create upload URL' });
+    return new Response(JSON.stringify({ error: err.message || 'Failed to create upload URL' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
