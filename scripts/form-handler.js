@@ -94,21 +94,36 @@ async function uploadFile(file) {
     throw new Error("Uploads are not available on GitHub Pages without a configured backend endpoint.");
   }
 
-  const formData = new FormData();
-  formData.append("file", file);
-  const response = await fetch(endpoint, {
+  // Step 1: ask backend for a Vercel Blob upload URL
+  const metaResponse = await fetch(endpoint, {
     method: "POST",
-    body: formData,
   });
-  if (!response.ok) {
-    const text = await response.text();
+  if (!metaResponse.ok) {
+    const text = await metaResponse.text();
+    if (metaResponse.status === 403) {
+      throw new Error("Upload forbidden. Configure Vercel Blob (BLOB_READ_WRITE_TOKEN) or use an HTTPS backend endpoint.");
+    }
+    throw new Error(text || "Failed to create upload session");
+  }
+  const meta = await metaResponse.json();
+  if (!meta || !meta.uploadUrl) {
+    throw new Error("Invalid upload session response");
+  }
+
+  // Step 2: upload file directly from browser to Vercel Blob
+  const uploadResponse = await fetch(meta.uploadUrl, {
+    method: "POST",
+    body: file,
+  });
+  if (!uploadResponse.ok) {
+    const text = await uploadResponse.text();
     throw new Error(text || "Upload failed");
   }
-  const data = await response.json();
-  if (!data || !data.fileUrl) {
+  const blobData = await uploadResponse.json();
+  if (!blobData || !blobData.url) {
     throw new Error("Invalid upload response");
   }
-  return data.fileUrl;
+  return blobData.url;
 }
 
 function readFileAsDataURL(file) {
