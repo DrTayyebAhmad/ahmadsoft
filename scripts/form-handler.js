@@ -1,51 +1,82 @@
 document.getElementById("app-form").addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  const demoInput = document.getElementById("demo-file");
-  const fullInput = document.getElementById("full-file");
-  const demoFile = demoInput?.files[0];
-  const fullFile = fullInput?.files[0] || null;
+  console.log("Form submitted");
 
-  if (!demoFile) {
-    alert("Please upload a demo file.");
+  const fileInput = document.getElementById("app-file");
+  const file = fileInput.files[0];
+
+  if (!file) {
+    alert("Please upload an app file.");
     return;
   }
 
-  const name = document.getElementById("app-name").value;
-  const platform = document.getElementById("platform").value;
-  const description = document.getElementById("description").value;
-  const hyperlink = document.getElementById("hyperlink").value || "";
-  const screenshot = document.getElementById("screenshot").value;
-  const rating = parseFloat(document.getElementById("rating").value);
-  const price = parseFloat(document.getElementById("price").value) || 0;
-
-  const formData = new FormData();
-  formData.append("name", name);
-  formData.append("platform", platform);
-  formData.append("description", description);
-  formData.append("hyperlink", hyperlink);
-  formData.append("screenshot", screenshot);
-  formData.append("rating", rating.toString());
-  formData.append("price", price.toString());
-  formData.append("demo_file", demoFile);
-  if (fullFile) {
-    formData.append("full_file", fullFile);
-  }
+  console.log("File selected:", file.name);
 
   try {
-    if (!window.pb) {
-      throw new Error("PocketBase client not initialized.");
+    console.log("Uploading file...");
+    let fileUrl = null;
+    let fileData = null;
+    try {
+      fileUrl = await uploadFile(file);
+      console.log("File uploaded successfully. URL:", fileUrl);
+    } catch (uploadErr) {
+      const readerResult = await readFileAsDataURL(file);
+      fileData = readerResult;
+      console.log("Backend upload failed; stored file to localStorage as base64");
     }
 
-    const record = await window.pb.collection("apps").create(formData);
-    console.log("Created app record:", record);
+    const newApp = {
+      id: Date.now().toString(),
+      name: document.getElementById("app-name").value,
+      platform: document.getElementById("platform").value,
+      description: document.getElementById("description").value,
+      hyperlink: document.getElementById("hyperlink").value || null,
+      screenshot: document.getElementById("screenshot").value,
+      rating: parseFloat(document.getElementById("rating").value),
+      fileName: file.name,
+      fileUrl: fileUrl,
+      fileData: fileData,
+    };
+
+    console.log("New App Object:", newApp);
+
+    const apps = JSON.parse(localStorage.getItem("apps")) || [];
+    apps.push(newApp);
+    localStorage.setItem("apps", JSON.stringify(apps));
 
     alert("App submitted successfully!");
     document.getElementById("app-form").reset();
     window.location.href = "index.html";
   } catch (error) {
     console.error("Error:", error);
-    const msg = error && error.message ? error.message : String(error) || "Failed to submit app. Please try again.";
-    alert(msg);
+    alert("Failed to submit app. Please try again.");
   }
 });
+
+async function uploadFile(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await fetch("http://localhost:3000/upload", {
+    method: "POST",
+    body: formData,
+  });
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || "Upload failed");
+  }
+  const data = await response.json();
+  if (!data || !data.fileUrl) {
+    throw new Error("Invalid upload response");
+  }
+  return data.fileUrl;
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("File read error"));
+    reader.readAsDataURL(file);
+  });
+}

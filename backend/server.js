@@ -23,10 +23,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({
-  storage,
-  limits: { fileSize: 500 * 1024 * 1024 }
-});
+const upload = multer({ storage });
 
 // Serve static files from the "uploads" folder
 app.use("/uploads", express.static(uploadDir));
@@ -36,16 +33,11 @@ app.post("/upload", upload.single("file"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
-
-  const PORT = process.env.PORT || 3000;
-  const HOST = process.env.HOST || "http://localhost";
-  const BASE_URL = process.env.BASE_URL || `${HOST}:${PORT}`;
-  const fileUrl = `${BASE_URL}/uploads/${req.file.filename}`;
+  const fileUrl = `http://localhost:3000/uploads/${req.file.filename}`;
   res.json({ fileUrl });
 });
 
 // Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(3000, () => {
+  console.log("Server running on http://localhost:3000");
 });
