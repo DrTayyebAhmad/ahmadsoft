@@ -11,25 +11,39 @@ function logout() {
 }
 
 const appGrid = document.getElementById("app-grid");
+let manageAppsCache = [];
 
-function displayApps() {
+function getPocketBaseClientForManage() {
+  if (window.pb) return window.pb;
+  if (window.PocketBase) {
+    window.pb = new window.PocketBase('http://127.0.0.1:8090');
+    return window.pb;
+  }
+  throw new Error('PocketBase client not initialized');
+}
+
+async function displayApps() {
   appGrid.innerHTML = "";
-  
+
   let apps = [];
   try {
-    const storedApps = localStorage.getItem("apps");
-    apps = storedApps ? JSON.parse(storedApps) : [];
+    const pb = getPocketBaseClientForManage();
+    apps = await pb.collection('apps').getFullList({
+      sort: '-created',
+    });
+    manageAppsCache = apps;
   } catch (e) {
-    console.error('Error loading apps:', e);
+    console.error('Error loading apps from PocketBase:', e);
+    appGrid.innerHTML = '<p>Failed to load apps.</p>';
     return;
   }
 
-  if (apps.length === 0) {
+  if (!apps || apps.length === 0) {
     appGrid.innerHTML = "<p>No apps available.</p>";
     return;
   }
 
-  apps.forEach((app, index) => {
+  apps.forEach((app) => {
     const appCard = document.createElement("div");
     appCard.classList.add("app-card");
 
@@ -40,63 +54,51 @@ function displayApps() {
       <h3>${app.name}</h3>
       <p>${app.description}</p>
       <p><strong>Platform:</strong> ${app.platform}</p>
-      <div class="rating">${"★".repeat(Math.floor(app.rating))}${"☆".repeat(5 - Math.floor(app.rating))}</div>
+      <div class="rating">${"★".repeat(Math.floor(app.rating || 0))}${"☆".repeat(5 - Math.floor(app.rating || 0))}</div>
       <div class="app-actions">
-      <button onclick="downloadApp('${app.id}')">Download</button>
-      <button onclick="editApp(${index})">Edit</button>
-      <button onclick="deleteApp(${index}, '${app.id}')">Delete</button>
+      <button onclick="downloadApp('${app.id}')">Download Demo</button>
+      <button onclick="deleteApp('${app.id}')">Delete</button>
       </div>
-    `;
+      `;
 
     appGrid.appendChild(appCard);
   });
 }
 
-function downloadApp(appId) {
+async function downloadApp(appId) {
   try {
-    const apps = JSON.parse(localStorage.getItem("apps")) || [];
-    const app = apps.find(a => a.id === appId);
-    if (app && app.fileUrl) {
-      const a = document.createElement("a");
-      a.href = app.fileUrl;
-      a.download = app.fileName || `app_${appId}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      return;
-    }
-    const fileData = localStorage.getItem(`file_${appId}`);
-    if (fileData) {
-      const blob = new Blob([fileData], { type: "application/octet-stream" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = app && app.fileName ? app.fileName : `app_${appId}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      return;
-    }
-    alert("Download file not available.");
+    const app = manageAppsCache.find(a => a.id === appId);
+    if (!app) { alert('App not found'); return; }
+    if (!app.demo_file) { alert('Demo file not available.'); return; }
+
+    const pb = getPocketBaseClientForManage();
+    const url = pb.files.getUrl(app, app.demo_file);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = app.demo_file || `app_${appId}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   } catch (e) {
+    console.error('Download failed:', e);
     alert("Download failed.");
   }
 }
 
-function editApp(index) {
-  localStorage.setItem("editAppIndex", index);
-  window.location.href = "submit-app.html";
-}
+function deleteApp(appId) {
+  if (!confirm("Are you sure you want to delete this app?")) return;
 
-function deleteApp(index, appId) {
-  if (confirm("Are you sure you want to delete this app?")) {
-    const apps = JSON.parse(localStorage.getItem("apps")) || [];
-    apps.splice(index, 1);
-    localStorage.setItem("apps", JSON.stringify(apps));
-    localStorage.removeItem(`file_${appId}`);
-    displayApps();
-  }
+  (async () => {
+    try {
+      const pb = getPocketBaseClientForManage();
+      await pb.collection('apps').delete(appId);
+      manageAppsCache = manageAppsCache.filter(a => a.id !== appId);
+      displayApps();
+    } catch (e) {
+      console.error('Delete failed:', e);
+      alert('Failed to delete app.');
+    }
+  })();
 }
 
 // Check authentication and display apps when page loads

@@ -1,28 +1,52 @@
-function displayFeaturedApps() {
+let featuredAppsCache = [];
+
+function getPocketBaseClient() {
+	if (window.pb) return window.pb;
+	if (window.PocketBase) {
+		window.pb = new window.PocketBase('http://127.0.0.1:8090');
+		return window.pb;
+	}
+	throw new Error('PocketBase client not initialized');
+}
+
+async function displayFeaturedApps() {
 	const featuredAppsContainer = document.getElementById('featured-apps');
 	if (!featuredAppsContainer) return;
 
-	const apps = JSON.parse(localStorage.getItem('apps')) || [];
-	
-	if (apps.length === 0) {
+	let apps = [];
+	try {
+		const pb = getPocketBaseClient();
+		apps = await pb.collection('apps').getFullList({
+			sort: '-created',
+		});
+		featuredAppsCache = apps;
+	} catch (err) {
+		console.error('Failed to load apps from PocketBase:', err);
+		featuredAppsContainer.innerHTML = '<p>Failed to load apps.</p>';
+		return;
+	}
+
+	if (!apps || apps.length === 0) {
 		featuredAppsContainer.innerHTML = "<p>No featured apps available.</p>";
 		return;
 	}
 
 	featuredAppsContainer.innerHTML = '';
 	
+	const pb = getPocketBaseClient();
 	apps.forEach(app => {
 		const appCard = document.createElement('div');
 		appCard.classList.add('featured-app-card');
 		
-		// Create hyperlink HTML if it exists
 		const hyperlinkHtml = app.hyperlink ? 
 			`<p><strong>Website:</strong> <a href="${app.hyperlink}" target="_blank">Visit Website</a></p>` : '';
 
-		const priceLabel = app.price && app.price > 0 ? `<p><strong>Price:</strong> $${app.price.toFixed(2)}</p>` : `<p><strong>Price:</strong> Free</p>`;
+		const priceValue = typeof app.price === 'number' ? app.price : parseFloat(app.price || '0');
+		const priceLabel = priceValue && priceValue > 0 ? `<p><strong>Price:</strong> $${priceValue.toFixed(2)}</p>` : `<p><strong>Price:</strong> Free</p>`;
 		const isBought = isPurchased(app.id);
-		const hasDemo = !!(app.demoFileUrl || app.demoFileData);
-		const hasFull = !!(app.fullFileUrl || app.fullFileData);
+
+		const hasDemo = !!app.demo_file;
+		const hasFull = !!app.full_file;
 
 		const demoBtn = hasDemo ? `<button onclick="downloadDemo('${app.id}')" class="download-btn">Download Demo</button>` : '';
 		const fullBtn = hasFull ? (isBought ? `<button onclick="downloadFull('${app.id}')" class="download-btn">Download Full</button>` : `<button onclick="buyFullVersion('${app.id}')" class="download-btn">Buy Full Version</button>`) : '';
@@ -35,7 +59,7 @@ function displayFeaturedApps() {
 			<p>${app.description}</p>
 			<p><strong>Platform:</strong> ${app.platform}</p>
 			${hyperlinkHtml}
-			<div class="rating">${"★".repeat(Math.floor(app.rating))}${"☆".repeat(5 - Math.floor(app.rating))}</div>
+			<div class="rating">${"★".repeat(Math.floor(app.rating || 0))}${"☆".repeat(5 - Math.floor(app.rating || 0))}</div>
 			${priceLabel}
 			<div class="actions">${demoBtn} ${fullBtn}</div>
 		`;
@@ -45,28 +69,38 @@ function displayFeaturedApps() {
 }
 
 function downloadDemo(appId) {
-    const apps = JSON.parse(localStorage.getItem('apps')) || [];
-    const app = apps.find(a => a.id === appId);
+    const app = featuredAppsCache.find(a => a.id === appId);
     if (!app) { alert('App not found'); return; }
-    if (app.demoFileUrl) { triggerDownload(app.demoFileUrl, app.demoFileName || `demo_${app.id}`); return; }
-    if (!app.demoFileData) { alert('Demo not available'); return; }
-    downloadFromBase64(app.demoFileData, app.demoFileName || `demo_${app.id}`);
+    if (!app.demo_file) { alert('Demo not available'); return; }
+    try {
+        const pb = getPocketBaseClient();
+        const url = pb.files.getUrl(app, app.demo_file);
+        triggerDownload(url, app.demo_file);
+    } catch (e) {
+        console.error('Demo download failed:', e);
+        alert('Demo download failed.');
+    }
 }
 
 function downloadFull(appId) {
-    const apps = JSON.parse(localStorage.getItem('apps')) || [];
-    const app = apps.find(a => a.id === appId);
+    const app = featuredAppsCache.find(a => a.id === appId);
     if (!app) { alert('App not found'); return; }
     if (!isPurchased(appId)) { alert('Please purchase to download full version'); return; }
-    if (app.fullFileUrl) { triggerDownload(app.fullFileUrl, app.fullFileName || `full_${app.id}`); return; }
-    if (!app.fullFileData) { alert('Full version not available'); return; }
-    downloadFromBase64(app.fullFileData, app.fullFileName || `full_${app.id}`);
+    if (!app.full_file) { alert('Full version not available'); return; }
+    try {
+        const pb = getPocketBaseClient();
+        const url = pb.files.getUrl(app, app.full_file);
+        triggerDownload(url, app.full_file);
+    } catch (e) {
+        console.error('Full download failed:', e);
+        alert('Full version download failed.');
+    }
 }
 
 function buyFullVersion(appId) {
-    const apps = JSON.parse(localStorage.getItem('apps')) || [];
-    const app = apps.find(a => a.id === appId);
+    const app = featuredAppsCache.find(a => a.id === appId);
     if (!app) { alert('App not found'); return; }
+    if (!(app.full_file)) { alert('Full version not available'); return; }
     if (!(app.fullFileUrl || app.fullFileData)) { alert('Full version not available'); return; }
     const url = getPaymentUrl(app);
     window.location.href = url;
@@ -129,6 +163,9 @@ function handlePaymentReturn() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', function(){ handlePaymentReturn(); displayFeaturedApps(); });
+document.addEventListener('DOMContentLoaded', function(){
+	  handlePaymentReturn();
+	  displayFeaturedApps();
+});
 
 

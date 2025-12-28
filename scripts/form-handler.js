@@ -1,8 +1,6 @@
 document.getElementById("app-form").addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  console.log("Form submitted");
-
   const demoInput = document.getElementById("demo-file");
   const fullInput = document.getElementById("full-file");
   const demoFile = demoInput?.files[0];
@@ -13,63 +11,34 @@ document.getElementById("app-form").addEventListener("submit", async function (e
     return;
   }
 
-  console.log("Demo file selected:", demoFile.name);
-  if (fullFile) console.log("Full file selected:", fullFile.name);
+  const name = document.getElementById("app-name").value;
+  const platform = document.getElementById("platform").value;
+  const description = document.getElementById("description").value;
+  const hyperlink = document.getElementById("hyperlink").value || "";
+  const screenshot = document.getElementById("screenshot").value;
+  const rating = parseFloat(document.getElementById("rating").value);
+  const price = parseFloat(document.getElementById("price").value) || 0;
+
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("platform", platform);
+  formData.append("description", description);
+  formData.append("hyperlink", hyperlink);
+  formData.append("screenshot", screenshot);
+  formData.append("rating", rating.toString());
+  formData.append("price", price.toString());
+  formData.append("demo_file", demoFile);
+  if (fullFile) {
+    formData.append("full_file", fullFile);
+  }
 
   try {
-    console.log("Uploading file...");
-    let demoFileUrl = null;
-    let demoFileData = null;
-    let fullFileUrl = null;
-    let fullFileData = null;
-    try {
-      demoFileUrl = await uploadFile(demoFile);
-      console.log("Demo upload URL:", demoFileUrl);
-    } catch (uploadErr) {
-      if (demoFile.size <= 5 * 1024 * 1024) {
-        const readerResult = await readFileAsDataURL(demoFile);
-        demoFileData = readerResult;
-      } else {
-        throw uploadErr;
-      }
+    if (!window.pb) {
+      throw new Error("PocketBase client not initialized.");
     }
 
-    if (fullFile) {
-      try {
-        fullFileUrl = await uploadFile(fullFile);
-        console.log("Full upload URL:", fullFileUrl);
-      } catch (uploadErr2) {
-        if (fullFile.size <= 5 * 1024 * 1024) {
-          const readerResult2 = await readFileAsDataURL(fullFile);
-          fullFileData = readerResult2;
-        } else {
-          throw uploadErr2;
-        }
-      }
-    }
-
-    const newApp = {
-      id: Date.now().toString(),
-      name: document.getElementById("app-name").value,
-      platform: document.getElementById("platform").value,
-      description: document.getElementById("description").value,
-      hyperlink: document.getElementById("hyperlink").value || null,
-      screenshot: document.getElementById("screenshot").value,
-      rating: parseFloat(document.getElementById("rating").value),
-      price: parseFloat(document.getElementById("price").value) || 0,
-      demoFileName: demoFile.name,
-      demoFileUrl: demoFileUrl,
-      demoFileData: demoFileData,
-      fullFileName: fullFile ? fullFile.name : null,
-      fullFileUrl: fullFileUrl,
-      fullFileData: fullFileData,
-    };
-
-    console.log("New App Object:", newApp);
-
-    const apps = JSON.parse(localStorage.getItem("apps")) || [];
-    apps.push(newApp);
-    localStorage.setItem("apps", JSON.stringify(apps));
+    const record = await window.pb.collection("apps").create(formData);
+    console.log("Created app record:", record);
 
     alert("App submitted successfully!");
     document.getElementById("app-form").reset();
@@ -80,73 +49,3 @@ document.getElementById("app-form").addEventListener("submit", async function (e
     alert(msg);
   }
 });
-
-async function uploadFile(file) {
-  const stored = typeof window !== "undefined" ? localStorage.getItem("uploadEndpoint") : null;
-  const endpoint = (typeof window !== "undefined" && (window.UPLOAD_ENDPOINT || stored))
-    ? (window.UPLOAD_ENDPOINT || stored)
-    : "/api/upload";
-
-  if (window.location && window.location.protocol === "https:" && endpoint.startsWith("http://")) {
-    throw new Error("Uploads require HTTPS endpoint when site is served over HTTPS.");
-  }
-  if (window.location && /github\.io$/i.test(window.location.hostname) && (!window.UPLOAD_ENDPOINT || window.UPLOAD_ENDPOINT === "")) {
-    throw new Error("Uploads are not available on GitHub Pages without a configured backend endpoint.");
-  }
-
-  // Step 1: ask backend for a Vercel Blob upload URL
-  const metaResponse = await fetch(endpoint, {
-    method: "POST",
-  });
-  if (!metaResponse.ok) {
-    const text = await metaResponse.text();
-    if (metaResponse.status === 403) {
-      throw new Error("Upload forbidden. Configure Vercel Blob (BLOB_READ_WRITE_TOKEN) or use an HTTPS backend endpoint.");
-    }
-    throw new Error(text || "Failed to create upload session");
-  }
-  const meta = await metaResponse.json();
-  if (!meta || !meta.uploadUrl) {
-    throw new Error("Invalid upload session response");
-  }
-
-  // Step 2: upload file directly from browser to Vercel Blob
-  const uploadResponse = await fetch(meta.uploadUrl, {
-    method: "POST",
-    body: file,
-  });
-  if (!uploadResponse.ok) {
-    const text = await uploadResponse.text();
-    throw new Error(text || "Upload failed");
-  }
-  const blobData = await uploadResponse.json();
-  if (!blobData || !blobData.url) {
-    throw new Error("Invalid upload response");
-  }
-  return blobData.url;
-}
-
-function readFileAsDataURL(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error("File read error"));
-    reader.readAsDataURL(file);
-  });
-}
-
-(function(){
-  try {
-    const qs = new URLSearchParams(window.location.search);
-    const ep = qs.get("uploadEndpoint");
-    if (ep) {
-      localStorage.setItem("uploadEndpoint", ep);
-      window.UPLOAD_ENDPOINT = ep;
-    } else {
-      const stored = localStorage.getItem("uploadEndpoint");
-      if (stored) {
-        window.UPLOAD_ENDPOINT = stored;
-      }
-    }
-  } catch (_) {}
-})();

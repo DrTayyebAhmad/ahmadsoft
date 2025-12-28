@@ -60,7 +60,11 @@
   <footer>
     <p>&copy; 2025 <span>Ahmad Soft</span>. All rights reserved.</p>
   </footer>
-
+  <script src="https://unpkg.com/pocketbase/dist/pocketbase.umd.js"></script>
+  <script>
+  const pb = new PocketBase('https://polycythaemic-ellsworth-finickingly.ngrok-free.dev');
+  window.pb = pb;
+  </script>
   <script src="scripts/form-handler.js"></script>
 </body>
 </html>
