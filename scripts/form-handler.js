@@ -3,7 +3,7 @@ document.getElementById("app-form").addEventListener("submit", async function (e
 
   console.log("Form submitted");
 
-  const fileInput = document.getElementById("app-file");
+  const fileInput = document.getElementById("demo-file");
   const file = fileInput.files[0];
 
   if (!file) {
@@ -16,18 +16,16 @@ document.getElementById("app-form").addEventListener("submit", async function (e
   try {
     console.log("Uploading file...");
     let fileUrl = null;
-    let fileData = null;
     try {
       fileUrl = await uploadFile(file);
       console.log("File uploaded successfully. URL:", fileUrl);
     } catch (uploadErr) {
-      const readerResult = await readFileAsDataURL(file);
-      fileData = readerResult;
-      console.log("Backend upload failed; stored file to localStorage as base64");
+      console.warn("Backend upload failed; falling back to local storage for file data");
     }
 
+    const appId = Date.now().toString();
     const newApp = {
-      id: Date.now().toString(),
+      id: appId,
       name: document.getElementById("app-name").value,
       platform: document.getElementById("platform").value,
       description: document.getElementById("description").value,
@@ -36,7 +34,7 @@ document.getElementById("app-form").addEventListener("submit", async function (e
       rating: parseFloat(document.getElementById("rating").value),
       fileName: file.name,
       fileUrl: fileUrl,
-      fileData: fileData,
+      fileKey: `file_${appId}`,
     };
 
     console.log("New App Object:", newApp);
@@ -44,6 +42,16 @@ document.getElementById("app-form").addEventListener("submit", async function (e
     const apps = JSON.parse(localStorage.getItem("apps")) || [];
     apps.push(newApp);
     localStorage.setItem("apps", JSON.stringify(apps));
+
+    if (!fileUrl) {
+      try {
+        const readerResult = await readFileAsDataURL(file);
+        localStorage.setItem(`file_${appId}`, readerResult);
+        console.log("Stored file as base64 in localStorage under key:", `file_${appId}`);
+      } catch (e) {
+        console.warn("Failed to store file in localStorage (likely size limit). Ensure backend is running.", e);
+      }
+    }
 
     alert("App submitted successfully!");
     document.getElementById("app-form").reset();
