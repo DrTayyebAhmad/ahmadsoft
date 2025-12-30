@@ -23,7 +23,12 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 1024 * 1024 * 1024, // 1 GB
+  },
+});
 
 // Serve static files from the "uploads" folder
 app.use("/uploads", express.static(uploadDir));
