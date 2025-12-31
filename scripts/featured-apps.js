@@ -52,11 +52,13 @@ function downloadAppFile(appId) {
             document.body.removeChild(link);
             return;
         }
-        if (!app.fileData) {
+        const key = app.fileKey || `file_${appId}`;
+        const fileData = localStorage.getItem(key);
+        if (!fileData) {
             alert('App file not found');
             return;
         }
-        const base64Data = app.fileData.split(',')[1];
+        const base64Data = fileData.split(',')[1];
         const binaryString = window.atob(base64Data);
         const bytes = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++) {

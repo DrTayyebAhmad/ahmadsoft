@@ -14,30 +14,52 @@ apps.forEach((app) => {
     <p>${app.description}</p>
     <p><strong>Platform:</strong> ${app.platform}</p>
     <div class="rating">${"★".repeat(Math.floor(app.rating))}${"☆".repeat(5 - Math.floor(app.rating))}</div>
-    <button class="download-btn" onclick="downloadApp('${app.file}', '${app.fileName}')">Download</button>
+    <button class="download-btn" onclick="downloadApp('${app.id}')">Download</button>
   `;
 
   appGrid.appendChild(appCard);
 });
 
-// Download App Function
-function downloadApp(base64File, fileName) {
-  if (base64File) {
-    // Convert Base64 to a Blob
-    const byteCharacters = atob(base64File.split(",")[1]);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
+// Download App Function (uses same logic as featured-apps)
+function downloadApp(appId) {
+  try {
+    const apps = JSON.parse(localStorage.getItem("apps")) || [];
+    const app = apps.find((a) => a.id === appId);
+    if (!app) {
+      alert("App not found");
+      return;
     }
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: "application/octet-stream" });
-
-    // Create a download link
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = fileName;
-    link.click();
-  } else {
-    alert("Download link not available.");
+    if (app.fileUrl) {
+      const a = document.createElement("a");
+      a.href = app.fileUrl;
+      a.download = app.fileName || `app_${appId}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      return;
+    }
+    const key = app.fileKey || `file_${appId}`;
+    const fileData = localStorage.getItem(key);
+    if (!fileData) {
+      alert("App file not found");
+      return;
+    }
+    const base64Data = fileData.split(",")[1];
+    const binaryString = window.atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const blob = new Blob([bytes], { type: "application/octet-stream" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = app.fileName || `app_${appId}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  } catch (e) {
+    alert("Error downloading file.");
   }
 }
