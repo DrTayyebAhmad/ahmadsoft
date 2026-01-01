@@ -20,7 +20,7 @@ document.getElementById("app-form").addEventListener("submit", async function (e
       fileUrl = await uploadFile(file);
       console.log("File uploaded successfully. URL:", fileUrl);
     } catch (uploadErr) {
-      console.warn("Backend upload failed; falling back to local storage for file data");
+      console.warn("Backend upload failed; using local storage/indexedDB fallback");
     }
 
     const appId = Date.now().toString();
@@ -35,6 +35,7 @@ document.getElementById("app-form").addEventListener("submit", async function (e
       fileName: file.name,
       fileUrl: fileUrl,
       fileKey: `file_${appId}`,
+      fileStore: fileUrl ? "remote" : "indexeddb",
     };
 
     console.log("New App Object:", newApp);
@@ -45,11 +46,16 @@ document.getElementById("app-form").addEventListener("submit", async function (e
 
     if (!fileUrl) {
       try {
-        const readerResult = await readFileAsDataURL(file);
-        localStorage.setItem(`file_${appId}`, readerResult);
-        console.log("Stored file as base64 in localStorage under key:", `file_${appId}`);
+        await saveFileToIndexedDB(`file_${appId}`, file);
+        console.log("Stored file in IndexedDB under key:", `file_${appId}`);
       } catch (e) {
-        console.warn("Failed to store file in localStorage (likely size limit). Ensure backend is running.", e);
+        try {
+          const readerResult = await readFileAsDataURL(file);
+          localStorage.setItem(`file_${appId}`, readerResult);
+          console.log("Stored file as base64 in localStorage under key:", `file_${appId}`);
+        } catch (e2) {
+          console.warn("Failed to store file locally. Ensure backend is running.", e2);
+        }
       }
     }
 
@@ -86,5 +92,41 @@ function readFileAsDataURL(file) {
     reader.onload = () => resolve(reader.result);
     reader.onerror = () => reject(new Error("File read error"));
     reader.readAsDataURL(file);
+  });
+}
+
+function openFilesDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("appFiles", 1);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains("files")) {
+        db.createObjectStore("files", { keyPath: "key" });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(new Error("IndexedDB open error"));
+  });
+}
+
+async function saveFileToIndexedDB(key, file) {
+  const db = await openFilesDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction("files", "readwrite");
+    const store = tx.objectStore("files");
+    store.put({ key, blob: file });
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(new Error("IndexedDB write error"));
+  });
+}
+
+async function getFileFromIndexedDB(key) {
+  const db = await openFilesDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction("files", "readonly");
+    const store = tx.objectStore("files");
+    const req = store.get(key);
+    req.onsuccess = () => resolve(req.result ? req.result.blob : null);
+    req.onerror = () => reject(new Error("IndexedDB read error"));
   });
 }

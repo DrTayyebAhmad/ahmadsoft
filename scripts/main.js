@@ -21,7 +21,7 @@ apps.forEach((app) => {
 });
 
 // Download App Function (uses same logic as featured-apps)
-function downloadApp(appId) {
+async function downloadApp(appId) {
   try {
     const apps = JSON.parse(localStorage.getItem("apps")) || [];
     const app = apps.find((a) => a.id === appId);
@@ -40,17 +40,26 @@ function downloadApp(appId) {
     }
     const key = app.fileKey || `file_${appId}`;
     const fileData = localStorage.getItem(key);
-    if (!fileData) {
+    let blob = null;
+    if (fileData) {
+      const base64Data = fileData.split(",")[1];
+      const binaryString = window.atob(base64Data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      blob = new Blob([bytes], { type: "application/octet-stream" });
+    } else {
+      try {
+        blob = await getFileFromIndexedDB(key);
+      } catch (_) {
+        blob = null;
+      }
+    }
+    if (!blob) {
       alert("App file not found");
       return;
     }
-    const base64Data = fileData.split(",")[1];
-    const binaryString = window.atob(base64Data);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    const blob = new Blob([bytes], { type: "application/octet-stream" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -62,4 +71,27 @@ function downloadApp(appId) {
   } catch (e) {
     alert("Error downloading file.");
   }
+}
+async function openFilesDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("appFiles", 1);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains("files")) {
+        db.createObjectStore("files", { keyPath: "key" });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(new Error("IndexedDB open error"));
+  });
+}
+async function getFileFromIndexedDB(key) {
+  const db = await openFilesDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction("files", "readonly");
+    const store = tx.objectStore("files");
+    const req = store.get(key);
+    req.onsuccess = () => resolve(req.result ? req.result.blob : null);
+    req.onerror = () => reject(new Error("IndexedDB read error"));
+  });
 }
