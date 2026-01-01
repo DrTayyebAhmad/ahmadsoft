@@ -22,6 +22,22 @@ document.getElementById("app-form").addEventListener("submit", async function (e
     } catch (uploadErr) {
       console.warn("Backend upload failed; using local storage/indexedDB fallback");
     }
+    
+    const screenshotFileInput = document.getElementById("screenshot-file");
+    const screenshotFile = screenshotFileInput && screenshotFileInput.files && screenshotFileInput.files[0] ? screenshotFileInput.files[0] : null;
+    let screenshotValue = document.getElementById("screenshot").value || "";
+    if (screenshotFile) {
+      try {
+        const screenshotUrl = await uploadFile(screenshotFile);
+        screenshotValue = screenshotUrl;
+      } catch (e) {
+        try {
+          screenshotValue = await readFileAsDataURL(screenshotFile);
+        } catch (e2) {
+          screenshotValue = "";
+        }
+      }
+    }
 
     const appId = Date.now().toString();
     const newApp = {
@@ -30,7 +46,7 @@ document.getElementById("app-form").addEventListener("submit", async function (e
       platform: document.getElementById("platform").value,
       description: document.getElementById("description").value,
       hyperlink: document.getElementById("hyperlink").value || null,
-      screenshot: document.getElementById("screenshot").value,
+      screenshot: screenshotValue,
       rating: parseFloat(document.getElementById("rating").value),
       fileName: file.name,
       fileUrl: fileUrl,
