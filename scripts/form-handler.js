@@ -98,11 +98,18 @@ if (document.readyState === 'loading') {
 }
 
 async function uploadFile(file) {
-  const newBlob = await upload(file.name, file, {
-    access: 'public',
-    handleUploadUrl: '/api/upload',
-  });
-  return newBlob.url;
+  try {
+    console.log('Uploading file:', file.name, 'Size:', file.size, 'Type:', file.type);
+    const newBlob = await upload(file.name, file, {
+      access: 'public',
+      handleUploadUrl: '/api/upload',
+    });
+    console.log('Upload successful, blob URL:', newBlob.url);
+    return newBlob.url;
+  } catch (error) {
+    console.error('Upload file error:', error);
+    throw new Error(`File upload failed: ${error.message || 'Unknown error'}`);
+  }
 }
 
 async function saveApp(app) {
