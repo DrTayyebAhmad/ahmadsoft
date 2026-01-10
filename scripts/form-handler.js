@@ -76,13 +76,20 @@ document.getElementById("app-form").addEventListener("submit", async function (e
 
 async function uploadFile(file) {
   // Get upload URL from our API
+  console.log("Fetching upload URL from /api/upload...");
   const response = await fetch('/api/upload', { method: 'POST' });
   
   if (!response.ok) {
-    let errorMessage = 'Failed to get upload URL';
+    let errorMessage = `Failed to get upload URL (Status: ${response.status})`;
     try {
-        const data = await response.json();
-        if (data.error) errorMessage += `: ${data.error}`;
+        const text = await response.text();
+        try {
+            const data = JSON.parse(text);
+            if (data.error) errorMessage += `: ${data.error}`;
+            else errorMessage += `: ${text}`;
+        } catch {
+            errorMessage += `: ${text}`;
+        }
     } catch (e) {
         errorMessage += `: ${response.statusText}`;
     }
