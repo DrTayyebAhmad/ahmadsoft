@@ -10,16 +10,16 @@
 </head>
 <body>
   <header>
-    <h1><img src="images/logo.png" alt="" class="logo"><span>Ahmad Soft</span> - App Store</h1>
+    <h1><span>Ahmad Soft</span> - App Developers Hub</h1>
     <nav>
       <ul>
       <li><a href="index.html">Home</a></li>
       <li><a href="about.html">About Us</a></li>
-      <li><a href="terms.html">Terms</a></li>
-      <li><a href="privacy.html">Privacy</a></li>
-      <li><a href="refund.html">Refund Policy</a></li>
+      <li><a href="submit-app.html">Submit App</a></li>
+      <li><a href="login.html">Manage Apps</a></li>
       </ul>
     </nav>
+
   </header>
 
   <main>
@@ -32,19 +32,10 @@
     <p>&copy; 2025 <span>Ahmad Soft</span>. All rights reserved.</p>
   </footer>
 
-  
-  <script src="scripts/featured-apps.js"></script>
+  <script src="https://unpkg.com/pocketbase/dist/pocketbase.umd.js"></script>
   <script>
-    // Hidden shortcut: Press Ctrl + Shift + L to go to Manage Apps
-    document.addEventListener('keydown', function(event) {
-      if (event.ctrlKey && event.shiftKey && (event.key === 'L' || event.key === 'l')) {
-        window.location.href = 'login.html';
-      }
-      // Hidden shortcut: Press Ctrl + Shift + S to go to Submit App
-      if (event.ctrlKey && event.shiftKey && (event.key === 'S' || event.key === 's')) {
-        window.location.href = 'submit-app.html';
-      }
-    });
+    window.pb = new PocketBase('https://polycythaemic-ellsworth-finickingly.ngrok-free.dev');
   </script>
+  <script src="scripts/featured-apps.js"></script>
 </body>
 </html>

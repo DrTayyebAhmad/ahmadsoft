@@ -8,22 +8,20 @@
 </head>
 <body>
   <header>
-    <h1><img src="images/logo.png" alt="" class="logo"><span>Ahmad Soft</span> - Submit App</h1>
+    <h1><span>Ahmad Soft</span> - Submit Your App</h1>
     <nav>
       <ul>
         <li><a href="index.html">Home</a></li>
         <li><a href="about.html">About Us</a></li>
-        <li><a href="terms.html">Terms</a></li>
-        <li><a href="privacy.html">Privacy</a></li>
-        <li><a href="refund.html">Refund Policy</a></li>
+        <li><a href="submit-app.html">Submit App</a></li>
+        <li><a href="login.html">Manage Apps</a></li>
       </ul>
     </nav>
   </header>
 
   <section id="submit-app">
     <h2>Submit Your App</h2>
-    <!-- Added onsubmit="return false;" to prevent default submission if JS fails -->
-    <form id="app-form" onsubmit="event.preventDefault();">
+    <form id="app-form">
       <label for="app-name">App Name:</label>
       <input type="text" id="app-name" name="app-name" required>
 
@@ -37,29 +35,17 @@
         <label for="description">Description:</label>
         <textarea id="description" name="description" required></textarea>
 
-        <label for="features">Key Features (One per line):</label>
-        <textarea id="features" name="features" placeholder="- User friendly interface&#10;- Offline support&#10;- Cloud sync"></textarea>
-
-        <label for="deliverables">Deliverables (One per line):</label>
-        <textarea id="deliverables" name="deliverables" placeholder="- Source code&#10;- Documentation&#10;- 6 months support"></textarea>
-
         <label for="hyperlink">App Website/Link (Optional):</label>
         <input type="url" id="hyperlink" name="hyperlink" placeholder="https://example.com">
 
-        <label for="screenshot">Screenshot URL (Optional):</label>
-      <input type="url" id="screenshot" name="screenshot" placeholder="https://...">
-      
-      <label for="screenshot-file">Upload Screenshot (Optional):</label>
-      <input type="file" id="screenshot-file" name="screenshot-file" accept="image/*">
+        <label for="screenshot">Screenshot URL:</label>
+      <input type="url" id="screenshot" name="screenshot" required>
 
       <label for="rating">Rating:</label>
       <input type="number" id="rating" name="rating" min="1" max="5" step="0.1" required>
 
       <label for="price">Full Version Price (USD):</label>
       <input type="number" id="price" name="price" min="0" step="0.01" placeholder="0.00">
-      
-      <label for="purchase-link">Purchase Link (Optional):</label>
-      <input type="url" id="purchase-link" name="purchase-link" placeholder="https://checkout.paddle.com/pay?...">
 
       <label for="demo-file">Upload Demo File:</label>
       <input type="file" id="demo-file" name="demo-file" accept=".apk,.ipa,.exe,.msi,.appx,.msix,.msixbundle" required>
@@ -74,7 +60,11 @@
   <footer>
     <p>&copy; 2025 <span>Ahmad Soft</span>. All rights reserved.</p>
   </footer>
-  
-  <script type="module" src="scripts/form-handler.js?v=3"></script>
+  <script src="https://unpkg.com/pocketbase/dist/pocketbase.umd.js"></script>
+  <script>
+  const pb = new PocketBase('https://polycythaemic-ellsworth-finickingly.ngrok-free.dev');
+  window.pb = pb;
+  </script>
+  <script src="scripts/form-handler.js"></script>
 </body>
 </html>
