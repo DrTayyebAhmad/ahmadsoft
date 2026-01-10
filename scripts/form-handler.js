@@ -26,15 +26,21 @@ function initFormHandler() {
 
     try {
       console.log("Starting upload process...");
+      console.log("File selected:", file.name, "Size:", file.size, "Type:", file.type);
       
       // 1. Upload Demo File
       let fileUrl;
       try {
+          console.log("Attempting to upload demo file...");
           fileUrl = await uploadFile(file);
+          if (!fileUrl) {
+              throw new Error('Upload completed but no URL was returned');
+          }
       } catch (e) {
-          throw new Error(`Demo file upload failed: ${e.message}`);
+          console.error("Demo file upload error:", e);
+          throw new Error(`Demo file upload failed: ${e.message || e.toString()}`);
       }
-      console.log("Demo file uploaded:", fileUrl);
+      console.log("Demo file uploaded successfully:", fileUrl);
 
       // 2. Upload Screenshot (if exists)
       let screenshotUrl = document.getElementById("screenshot").value || "";
@@ -81,11 +87,25 @@ function initFormHandler() {
       window.location.href = "index.html";
 
     } catch (error) {
-      console.error("Error:", error);
-      alert("Failed to submit app: " + error.message);
+      console.error("Form submission error:", error);
+      console.error("Error name:", error.name);
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+      
+      // Provide more specific error messages
+      let errorMessage = "Failed to submit app: ";
+      if (error.message) {
+        errorMessage += error.message;
+      } else if (error.name === 'AbortError') {
+        errorMessage += "Upload was cancelled or timed out. Please check your connection and try again.";
+      } else {
+        errorMessage += "An unexpected error occurred. Please check the console for details.";
+      }
+      
+      alert(errorMessage);
     } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
     }
   });
 }
@@ -100,15 +120,71 @@ if (document.readyState === 'loading') {
 async function uploadFile(file) {
   try {
     console.log('Uploading file:', file.name, 'Size:', file.size, 'Type:', file.type);
+    
+    // Check if file is too large (500 MB limit)
+    if (file.size > 500 * 1024 * 1024) {
+      throw new Error('File size exceeds 500 MB limit');
+    }
+    
+    // First, test if the API endpoint is reachable
+    try {
+      const testResponse = await fetch('/api/upload', {
+        method: 'OPTIONS',
+        headers: {
+          'Origin': window.location.origin
+        }
+      });
+      console.log('API endpoint test (OPTIONS):', testResponse.status, testResponse.statusText);
+    } catch (testError) {
+      console.warn('API endpoint test failed:', testError);
+      // Continue anyway, as the actual request might still work
+    }
+    
+    console.log('Calling Vercel Blob upload function...');
+    const uploadStartTime = Date.now();
+    
     const newBlob = await upload(file.name, file, {
       access: 'public',
       handleUploadUrl: '/api/upload',
     });
+    
+    const uploadDuration = Date.now() - uploadStartTime;
+    console.log(`Upload completed in ${uploadDuration}ms`);
+    
+    if (!newBlob || !newBlob.url) {
+      throw new Error('Upload completed but no URL was returned');
+    }
+    
     console.log('Upload successful, blob URL:', newBlob.url);
     return newBlob.url;
   } catch (error) {
     console.error('Upload file error:', error);
-    throw new Error(`File upload failed: ${error.message || 'Unknown error'}`);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    
+    // Check if it's a network/abort error
+    if (error.name === 'AbortError' || error.name === 'AbortController') {
+      const detailedError = new Error('Upload was cancelled or timed out. This might be due to:\n' +
+        '1. Network connectivity issues\n' +
+        '2. Server not responding correctly\n' +
+        '3. CORS configuration problems\n' +
+        'Please check your internet connection and try again. If the problem persists, check the browser console and network tab for more details.');
+      console.error('AbortError details:', {
+        name: error.name,
+        message: error.message,
+        cause: error.cause
+      });
+      throw detailedError;
+    } else if (error.message && (error.message.includes('fetch') || error.message.includes('network'))) {
+      throw new Error('Network error during upload. Please check your internet connection and ensure the server is accessible.');
+    } else if (error.message && error.message.includes('BLOB_READ_WRITE_TOKEN')) {
+      throw new Error('Server configuration error: BLOB_READ_WRITE_TOKEN is missing. Please contact the administrator.');
+    } else if (error.message && error.message.includes('CORS')) {
+      throw new Error('CORS error: The server is not allowing requests from this origin. Please check server configuration.');
+    } else {
+      throw new Error(`File upload failed: ${error.message || 'Unknown error occurred. Please check the browser console for details.'}`);
+    }
   }
 }
 
