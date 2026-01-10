@@ -22,7 +22,8 @@
 
   <section id="submit-app">
     <h2>Submit Your App</h2>
-    <form id="app-form">
+    <!-- Added onsubmit="return false;" to prevent default submission if JS fails -->
+    <form id="app-form" onsubmit="event.preventDefault();">
       <label for="app-name">App Name:</label>
       <input type="text" id="app-name" name="app-name" required>
 
