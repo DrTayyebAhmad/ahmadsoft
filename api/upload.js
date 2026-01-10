@@ -1,10 +1,10 @@
 // pages/api/upload.js
 import { createUploadURL } from '@vercel/blob';
 
-const ALLOWED_ORIGIN = 'https://drtayyebahmad.github.io'; // or '*' while testing
+const ALLOWED_ORIGIN = '*'; // Allow any origin for now
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
+  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
