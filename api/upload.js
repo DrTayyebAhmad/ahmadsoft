@@ -2,16 +2,25 @@
 import { handleUpload } from '@vercel/blob/client';
 
 export default async function handler(req, res) {
+  // Log function invocation for debugging
+  console.log('Upload handler called:', {
+    method: req.method,
+    url: req.url,
+    contentType: req.headers?.['content-type'],
+    hasBody: req.body !== undefined,
+    bodyType: typeof req.body
+  });
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.setHeader('Access-Control-Allow-Origin', req.headers?.origin || '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-vercel-signature');
     return res.status(200).end();
   }
 
   // Set CORS headers for all responses
-  const origin = req.headers.origin || '*';
+  const origin = req.headers?.origin || '*';
   res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-vercel-signature');
@@ -26,13 +35,25 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Parse the request body - Vercel auto-parses JSON, but handle edge cases
+    // Parse the request body - Vercel might auto-parse, but we need to handle both cases
     let body = req.body;
     
-    // If body is undefined or null, it might not have been parsed
+    // For Vercel serverless functions, req.body should be auto-parsed for JSON
+    // But if it's undefined, we need to handle it
     if (body === undefined || body === null) {
-      console.error('Request body is undefined/null. Content-Type:', req.headers['content-type']);
-      return res.status(400).json({ error: 'Request body is missing' });
+      console.error('Request body is undefined/null. This might indicate a parsing issue.');
+      console.error('Content-Type:', req.headers['content-type']);
+      console.error('Request method:', req.method);
+      
+      return res.status(400).json({ 
+        error: 'Request body is missing or could not be parsed.',
+        hint: 'The upload request should include a JSON body. Please check the client-side upload implementation.',
+        debug: {
+          contentType: req.headers['content-type'],
+          method: req.method,
+          url: req.url
+        }
+      });
     }
 
     // If body is a string, try to parse it as JSON
@@ -40,18 +61,21 @@ export default async function handler(req, res) {
       try {
         body = JSON.parse(body);
       } catch (e) {
-        console.error('Failed to parse body as JSON:', e);
+        console.error('Failed to parse body as JSON:', e, 'Body:', body?.substring(0, 100));
         return res.status(400).json({ error: 'Invalid JSON body' });
       }
     }
 
     // Ensure body is an object
-    if (typeof body !== 'object' || Array.isArray(body)) {
-      console.error('Body is not an object:', typeof body, body);
-      return res.status(400).json({ error: 'Invalid request body format. Expected JSON object.' });
+    if (!body || (typeof body !== 'object') || Array.isArray(body)) {
+      console.error('Body is not an object:', typeof body, 'Value:', body);
+      return res.status(400).json({ 
+        error: 'Invalid request body format. Expected JSON object.',
+        receivedType: typeof body
+      });
     }
 
-    // Log for debugging (remove in production if needed)
+    // Log for debugging
     console.log('Received request body type:', body.type, 'payload keys:', Object.keys(body.payload || {}));
 
     // Create a request-like object compatible with handleUpload
@@ -93,10 +117,17 @@ export default async function handler(req, res) {
     return res.status(200).json(jsonResponse);
   } catch (error) {
     console.error('Upload error:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
-    return res.status(400).json({ 
-      error: error.message || 'Upload failed',
-      ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
-    });
+    
+    // Ensure we haven't already sent headers
+    if (!res.headersSent) {
+      return res.status(400).json({ 
+        error: error.message || 'Upload failed',
+        errorName: error.name,
+        ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
+      });
+    }
   }
 }
