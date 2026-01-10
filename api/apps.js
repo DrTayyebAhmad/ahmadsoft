@@ -10,6 +10,10 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return res.status(500).json({ error: 'BLOB_READ_WRITE_TOKEN is missing. Please create a Blob store in Vercel.' });
+  }
+
   try {
     // Helper to find apps.json
     const getAppsData = async () => {

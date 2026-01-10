@@ -19,6 +19,10 @@ export default async function handler(req, res) {
       .json({ error: 'Method Not Allowed' });
   }
 
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return res.status(500).json({ error: 'BLOB_READ_WRITE_TOKEN is missing. Please create a Blob store in Vercel.' });
+  }
+
   try {
     const { url } = await createUploadURL({
       access: 'public',
