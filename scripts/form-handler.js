@@ -77,7 +77,18 @@ document.getElementById("app-form").addEventListener("submit", async function (e
 async function uploadFile(file) {
   // Get upload URL from our API
   const response = await fetch('/api/upload', { method: 'POST' });
-  if (!response.ok) throw new Error('Failed to get upload URL');
+  
+  if (!response.ok) {
+    let errorMessage = 'Failed to get upload URL';
+    try {
+        const data = await response.json();
+        if (data.error) errorMessage += `: ${data.error}`;
+    } catch (e) {
+        errorMessage += `: ${response.statusText}`;
+    }
+    throw new Error(errorMessage);
+  }
+
   const { uploadUrl } = await response.json();
 
   // Upload file to Vercel Blob
