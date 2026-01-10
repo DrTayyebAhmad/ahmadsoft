@@ -1,3 +1,5 @@
+import { upload } from 'https://cdn.jsdelivr.net/npm/@vercel/blob@0.22.0/client/index.js';
+
 document.getElementById("app-form").addEventListener("submit", async function (e) {
   e.preventDefault();
 
@@ -18,7 +20,12 @@ document.getElementById("app-form").addEventListener("submit", async function (e
     console.log("Starting upload process...");
     
     // 1. Upload Demo File
-    const fileUrl = await uploadFile(file);
+    let fileUrl;
+    try {
+        fileUrl = await uploadFile(file);
+    } catch (e) {
+        throw new Error(`Demo file upload failed: ${e.message}`);
+    }
     console.log("Demo file uploaded:", fileUrl);
 
     // 2. Upload Screenshot (if exists)
@@ -75,42 +82,11 @@ document.getElementById("app-form").addEventListener("submit", async function (e
 });
 
 async function uploadFile(file) {
-  // Get upload URL from our API
-  console.log("Fetching upload URL from /api/upload...");
-  const response = await fetch('/api/upload', { method: 'POST' });
-  
-  if (!response.ok) {
-    let errorMessage = `Failed to get upload URL (Status: ${response.status})`;
-    try {
-        const text = await response.text();
-        try {
-            const data = JSON.parse(text);
-            if (data.error) errorMessage += `: ${data.error}`;
-            else errorMessage += `: ${text}`;
-        } catch {
-            errorMessage += `: ${text}`;
-        }
-    } catch (e) {
-        errorMessage += `: ${response.statusText}`;
-    }
-    throw new Error(errorMessage);
-  }
-
-  const { uploadUrl } = await response.json();
-
-  // Upload file to Vercel Blob
-  const uploadResponse = await fetch(uploadUrl, {
-    method: 'PUT',
-    body: file,
-    headers: {
-      'x-vercel-multipart': '1', 
-    }
+  const newBlob = await upload(file.name, file, {
+    access: 'public',
+    handleUploadUrl: '/api/upload',
   });
-
-  if (!uploadResponse.ok) throw new Error('Failed to upload file to Blob');
-  
-  const blob = await uploadResponse.json();
-  return blob.url;
+  return newBlob.url;
 }
 
 async function saveApp(app) {
