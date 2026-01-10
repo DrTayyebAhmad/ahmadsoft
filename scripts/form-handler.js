@@ -1,8 +1,6 @@
 document.getElementById("app-form").addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  console.log("Form submitted");
-
   const fileInput = document.getElementById("demo-file");
   const file = fileInput.files[0];
 
@@ -11,59 +9,35 @@ document.getElementById("app-form").addEventListener("submit", async function (e
     return;
   }
 
-  console.log("File selected:", file.name);
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Uploading...";
 
   try {
-    console.log("Uploading file...");
-    let fileUrl = null;
-    try {
-      fileUrl = await uploadFile(file);
-      console.log("File uploaded successfully. URL:", fileUrl);
-    } catch (uploadErr) {
-      console.warn("Backend upload failed; using local storage/indexedDB fallback");
-    }
+    console.log("Starting upload process...");
     
+    // 1. Upload Demo File
+    const fileUrl = await uploadFile(file);
+    console.log("Demo file uploaded:", fileUrl);
+
+    // 2. Upload Screenshot (if exists)
+    let screenshotUrl = document.getElementById("screenshot").value || "";
     const screenshotFileInput = document.getElementById("screenshot-file");
-    const screenshotFile = screenshotFileInput && screenshotFileInput.files && screenshotFileInput.files[0] ? screenshotFileInput.files[0] : null;
-    let screenshotValue = document.getElementById("screenshot").value || "";
-    if (screenshotFile) {
-      try {
-        const screenshotUrl = await uploadFile(screenshotFile);
-        screenshotValue = screenshotUrl;
-      } catch (e) {
-        try {
-          screenshotValue = await readFileAsDataURL(screenshotFile);
-        } catch (e2) {
-          screenshotValue = "";
-        }
-      }
+    if (screenshotFileInput && screenshotFileInput.files[0]) {
+       screenshotUrl = await uploadFile(screenshotFileInput.files[0]);
+       console.log("Screenshot uploaded:", screenshotUrl);
+    }
+
+    // 3. Upload Full File (if exists)
+    let fullFileUrl = null;
+    const fullFileInput = document.getElementById("full-file");
+    if (fullFileInput && fullFileInput.files[0]) {
+        fullFileUrl = await uploadFile(fullFileInput.files[0]);
+        console.log("Full file uploaded:", fullFileUrl);
     }
 
     const appId = Date.now().toString();
-    const fullFileInput = document.getElementById("full-file");
-    const fullFile = fullFileInput && fullFileInput.files && fullFileInput.files[0] ? fullFileInput.files[0] : null;
-    let fullFileUrl = null;
-    let fullFileStore = null;
-    const fullKey = `full_${appId}`;
-    if (fullFile) {
-      try {
-        fullFileUrl = await uploadFile(fullFile);
-        fullFileStore = "remote";
-      } catch (e) {
-        try {
-          await saveFileToIndexedDB(fullKey, fullFile);
-          fullFileStore = "indexeddb";
-        } catch (e2) {
-          try {
-            const fullReader = await readFileAsDataURL(fullFile);
-            localStorage.setItem(fullKey, fullReader);
-            fullFileStore = "localstorage";
-          } catch (e3) {
-            fullFileStore = null;
-          }
-        }
-      }
-    }
     const newApp = {
       id: appId,
       name: document.getElementById("app-name").value,
@@ -72,109 +46,61 @@ document.getElementById("app-form").addEventListener("submit", async function (e
       features: document.getElementById("features").value || "",
       deliverables: document.getElementById("deliverables").value || "",
       hyperlink: document.getElementById("hyperlink").value || null,
-      screenshot: screenshotValue,
+      screenshot: screenshotUrl,
       rating: parseFloat(document.getElementById("rating").value),
       price: parseFloat(document.getElementById("price").value || "0") || 0,
       purchaseLink: document.getElementById("purchase-link").value || null,
       fileName: file.name,
       fileUrl: fileUrl,
-      fileKey: `file_${appId}`,
-      fileStore: fileUrl ? "remote" : "indexeddb",
-      fullFileName: fullFile ? fullFile.name : null,
+      fullFileName: fullFileInput && fullFileInput.files[0] ? fullFileInput.files[0].name : null,
       fullFileUrl: fullFileUrl,
-      fullFileKey: fullKey,
-      fullFileStore: fullFileStore,
+      createdAt: new Date().toISOString()
     };
 
-    console.log("New App Object:", newApp);
-
-    const apps = JSON.parse(localStorage.getItem("apps")) || [];
-    apps.push(newApp);
-    localStorage.setItem("apps", JSON.stringify(apps));
-
-    if (!fileUrl) {
-      try {
-        await saveFileToIndexedDB(`file_${appId}`, file);
-        console.log("Stored file in IndexedDB under key:", `file_${appId}`);
-      } catch (e) {
-        try {
-          const readerResult = await readFileAsDataURL(file);
-          localStorage.setItem(`file_${appId}`, readerResult);
-          console.log("Stored file as base64 in localStorage under key:", `file_${appId}`);
-        } catch (e2) {
-          console.warn("Failed to store file locally. Ensure backend is running.", e2);
-        }
-      }
-    }
+    // 4. Save App Metadata
+    await saveApp(newApp);
+    console.log("App saved successfully");
 
     alert("App submitted successfully!");
     document.getElementById("app-form").reset();
     window.location.href = "index.html";
+
   } catch (error) {
     console.error("Error:", error);
-    alert("Failed to submit app. Please try again.");
+    alert("Failed to submit app: " + error.message);
+  } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
   }
 });
 
 async function uploadFile(file) {
-  const formData = new FormData();
-  formData.append("file", file);
-  const response = await fetch("http://localhost:3000/upload", {
-    method: "POST",
-    body: formData,
+  // Get upload URL from our API
+  const response = await fetch('/api/upload', { method: 'POST' });
+  if (!response.ok) throw new Error('Failed to get upload URL');
+  const { uploadUrl } = await response.json();
+
+  // Upload file to Vercel Blob
+  const uploadResponse = await fetch(uploadUrl, {
+    method: 'PUT',
+    body: file,
+    headers: {
+      'x-vercel-multipart': '1', 
+    }
   });
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || "Upload failed");
-  }
-  const data = await response.json();
-  if (!data || !data.fileUrl) {
-    throw new Error("Invalid upload response");
-  }
-  return data.fileUrl;
+
+  if (!uploadResponse.ok) throw new Error('Failed to upload file to Blob');
+  
+  const blob = await uploadResponse.json();
+  return blob.url;
 }
 
-function readFileAsDataURL(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error("File read error"));
-    reader.readAsDataURL(file);
-  });
-}
-
-function openFilesDB() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open("appFiles", 1);
-    request.onupgradeneeded = () => {
-      const db = request.result;
-      if (!db.objectStoreNames.contains("files")) {
-        db.createObjectStore("files", { keyPath: "key" });
-      }
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(new Error("IndexedDB open error"));
-  });
-}
-
-async function saveFileToIndexedDB(key, file) {
-  const db = await openFilesDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction("files", "readwrite");
-    const store = tx.objectStore("files");
-    store.put({ key, blob: file });
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(new Error("IndexedDB write error"));
-  });
-}
-
-async function getFileFromIndexedDB(key) {
-  const db = await openFilesDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction("files", "readonly");
-    const store = tx.objectStore("files");
-    const req = store.get(key);
-    req.onsuccess = () => resolve(req.result ? req.result.blob : null);
-    req.onerror = () => reject(new Error("IndexedDB read error"));
-  });
+async function saveApp(app) {
+    const response = await fetch('/api/apps', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(app)
+    });
+    
+    if (!response.ok) throw new Error('Failed to save app metadata');
 }
