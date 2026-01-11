@@ -8,7 +8,8 @@
     "Track your mood with simple Visualize progress with a weekly progress bar.",
     "Review past entries.",
     "Set reminders to never miss a gratitude moment."
-
+  ],
+  "deliverables": [
     "Full Version",
     "🌙 Dark Mode : Switch between light and dark themes",
     "💬 Daily Quotes: Displays an inspirational quote",
@@ -18,16 +19,7 @@
     "6. 📊 Mood Analytics :",
     "A new \"Mood Insights\" section at the top displays a count of how many times you've recorded each mood (😊 😐 😢)."
   ],
-  "deliverables": [
-    "Full Version",
-    "Dark Mode : Switch between light and dark themes",
-    "Daily Quotes: Displays an inspirational quote",
-    "Enhanced Entries",
-    "Data Management: Import & Export",
-    "Search & Filter ",
-    "Mood Analytics :",
-    "A new \"Mood Insights\" section at the top displays a count of how many times you've recorded each mood."
-  ],
+  
   "hyperlink": "",
   "screenshot": "images/placeholder.png",
   "rating": 5,
