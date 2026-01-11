@@ -1,0 +1,29 @@
+{
+  "id": "1768151262420",
+  "name": "Gratitude",
+  "platform": "Android",
+  "description": "Gratitude Journal & Mood Tracker This Android app helps you build a daily habit of gratitude while keeping track of your emotional well-being.",
+  "features": [
+    "Record daily gratitude entries.",
+    "Track your mood with simple Visualize progress with a weekly progress bar.",
+    "Review past entries.",
+    "Set reminders to never miss a gratitude moment."
+  ],
+  "deliverables": [
+    "Full Version",
+    "🌙 Dark Mode : Switch between light and dark themes",
+    "💬 Daily Quotes: Displays an inspirational quote",
+    "📅 Enhanced Entries",
+    "💾 Data Management: Import & Export",
+    "🔍 Search & Filter ",
+    "6. 📊 Mood Analytics :",
+    "A new \"Mood Insights\" section at the top displays a count of how many times you've recorded each mood (😊 😐 😢)."
+  ],
+  "hyperlink": "",
+  "screenshot": "images/placeholder.png",
+  "rating": 5,
+  "price": 3.99,
+  "purchaseLink": "",
+  "demoUrl": "",
+  "fullUrl": ""
+}
