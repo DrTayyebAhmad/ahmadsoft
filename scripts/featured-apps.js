@@ -93,6 +93,22 @@ function renderAppCard(container, app) {
   </div>
 `;
 
+<div class="app-actions">
+  ${app.demoUrl ? `
+    <a href="${app.demoUrl}" class="download-btn" download>
+      Download Demo
+    </a>
+  ` : ""}
+
+  ${app.price > 0 && app.paddleCheckoutUrl ? `
+    <a href="${app.paddleCheckoutUrl}"
+       class="download-btn paid-btn"
+       target="_blank"
+       rel="noopener">
+      Buy Full Version ($${app.price})
+    </a>
+  ` : ""}
+</div>
 
 
   container.appendChild(card);
