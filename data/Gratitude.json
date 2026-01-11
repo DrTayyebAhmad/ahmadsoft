@@ -11,13 +11,13 @@
   ],
   "deliverables": [
     "Full Version",
-    "🌙 Dark Mode : Switch between light and dark themes",
-    "💬 Daily Quotes: Displays an inspirational quote",
-    "📅 Enhanced Entries",
-    "💾 Data Management: Import & Export",
-    "🔍 Search & Filter ",
-    "6. 📊 Mood Analytics :",
-    "A new \"Mood Insights\" section at the top displays a count of how many times you've recorded each mood (😊 😐 😢)."
+    "Dark Mode : Switch between light and dark themes",
+    "Daily Quotes: Displays an inspirational quote",
+    "Enhanced Entries",
+    "Data Management: Import & Export",
+    "Search & Filter ",
+    "Mood Analytics :",
+    "A new \"Mood Insights\" section at the top displays a count of how many times you've recorded each mood."
   ],
   "hyperlink": "",
   "screenshot": "images/placeholder.png",
