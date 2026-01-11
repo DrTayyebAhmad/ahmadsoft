@@ -57,26 +57,43 @@ function renderAppCard(container, app) {
     : "";
 
   card.innerHTML = `
-    <div class="img-wrapper">
-      <img src="${app.screenshot || 'images/placeholder.png'}"
-           onerror="this.src='images/placeholder.png'">
-    </div>
+  <div class="img-wrapper">
+    <img src="${app.screenshot || "images/placeholder.png"}"
+         alt="${app.name}"
+         onerror="this.src='images/placeholder.png'">
+  </div>
 
-    <h3>${app.name}</h3>
-    <p class="description">${app.description}</p>
-    <p><strong>Platform:</strong> ${app.platform}</p>
+  <h3>${app.name}</h3>
+  <p>${app.description}</p>
 
-    ${featuresHtml}
+  <p><strong>Platform:</strong> ${app.platform}</p>
+  <p><strong>Price:</strong> ${app.price && app.price > 0 ? `$${app.price}` : "Free"}</p>
 
-    <div class="rating">
-      ${"★".repeat(app.rating || 0)}${"☆".repeat(5 - (app.rating || 0))}
-    </div>
+  ${app.features?.length ? `
+    <h4>Key Features</h4>
+    <ul class="features-list">
+      ${app.features.map(f => `<li>${f}</li>`).join("")}
+    </ul>
+  ` : ""}
 
-    <div class="actions">
-      ${demoBtn}
-      ${fullBtn}
-    </div>
-  `;
+  ${app.deliverables?.length ? `
+    <h4>Deliverables</h4>
+    <ul class="deliverables-list">
+      ${app.deliverables.map(d => `<li>${d}</li>`).join("")}
+    </ul>
+  ` : ""}
+
+  <div class="rating">
+    ${"★".repeat(app.rating || 0)}${"☆".repeat(5 - (app.rating || 0))}
+  </div>
+
+  <div class="app-actions">
+    ${app.demoUrl ? `<a href="${app.demoUrl}" class="download-btn" target="_blank">Download Demo</a>` : ""}
+    ${app.fullUrl ? `<a href="${app.fullUrl}" class="download-btn" target="_blank">Download Full</a>` : ""}
+  </div>
+`;
+
+
 
   container.appendChild(card);
 }
