@@ -26,5 +26,7 @@
   "price": 3.99,
   "purchaseLink": "",
   "demoUrl": "https://github.com/DrTayyebAhmad/ahmadsoft/releases/download/v1.0.0/Gratitude.Demo_1_1.0.apk ",
-  "fullUrl": "https://github.com/DrTayyebAhmad/ahmadsoft/releases/download/v1.0.0/Gratitude.Full._1_1.0.apk "
+  "paddleCheckoutUrl": "https://checkout.paddle.com/pay/xxxxx",
+
+  "fullDownloadUrl": "/downloads/gratitude-full.apk"
 }
