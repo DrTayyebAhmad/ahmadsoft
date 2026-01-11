@@ -366,3 +366,61 @@ footer p span {
   border-radius: 4px;
   font-size: 1rem;
 }
+/* --- FIX LOGO SIZE --- */
+header .logo {
+  height: 40px;
+  width: auto;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+/* --- FEATURED APP DETAILS --- */
+.featured-app-card .description {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0.5rem 0;
+}
+
+.featured-app-card h4 {
+  margin-top: 1rem;
+  margin-bottom: 0.3rem;
+  color: #333;
+  font-size: 1rem;
+  seen
+}
+
+.featured-app-card ul {
+  text-align: left;
+  padding-left: 1.2rem;
+  margin: 0;
+}
+
+.featured-app-card ul li {
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+
+/* --- ACTION BUTTONS --- */
+.featured-app-card .actions {
+  margin-top: auto;
+}
+
+.featured-app-card .btn {
+  display: inline-block;
+  padding: 8px 12px;
+  background: #6C63FF;
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  margin: 6px 4px 0;
+  font-size: 0.9rem;
+}
+
+.featured-app-card .btn.primary {
+  background: #FF6584;
+}
+
+/* --- PREVENT FLICKER --- */
+#featured-apps {
+  min-height: 300px;
+}
