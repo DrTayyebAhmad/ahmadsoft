@@ -1,61 +1,82 @@
-const APPS_INDEX = "/data/apps-index.json";
-const APPS_DIR = "/data/";
+const APPS_INDEX_URL = "data/apps-index.json";
 
-document.addEventListener("DOMContentLoaded", loadApps);
+document.addEventListener("DOMContentLoaded", loadFeaturedApps);
 
-async function loadApps() {
+async function loadFeaturedApps() {
   const container = document.getElementById("featured-apps");
-  container.innerHTML = "<p>Loading apps…</p>";
+  if (!container) return;
+
+  container.innerHTML = "<p>Loading apps...</p>";
 
   try {
-    const indexRes = await fetch(APPS_INDEX);
-    const files = await indexRes.json();
+    // 1. Load index
+    const indexRes = await fetch(APPS_INDEX_URL);
+    if (!indexRes.ok) throw new Error("Index not found");
 
-    container.innerHTML = "";
+    const appFiles = await indexRes.json();
 
-    for (const file of files) {
-      const res = await fetch(APPS_DIR + file);
-      const app = await res.json();
-      container.appendChild(renderApp(app));
+    if (!Array.isArray(appFiles) || appFiles.length === 0) {
+      container.innerHTML = "<p>No apps available.</p>";
+      return;
     }
-  } catch (e) {
+
+    container.innerHTML = ""; // clear once only
+
+    // 2. Load each app JSON
+    for (const file of appFiles) {
+      try {
+        const appRes = await fetch(`data/${file}`);
+        if (!appRes.ok) continue;
+
+        const app = await appRes.json();
+        renderAppCard(container, app);
+      } catch (err) {
+        console.warn("Failed loading", file, err);
+      }
+    }
+  } catch (err) {
+    console.error(err);
     container.innerHTML = "<p>Failed to load apps.</p>";
-    console.error(e);
   }
 }
 
-function renderApp(app) {
+function renderAppCard(container, app) {
   const card = document.createElement("div");
   card.className = "featured-app-card";
 
+  const featuresHtml = Array.isArray(app.features)
+    ? `<ul>${app.features.map(f => `<li>${f}</li>`).join("")}</ul>`
+    : "";
+
+  const demoBtn = app.demoUrl
+    ? `<a class="btn" href="${app.demoUrl}" download>Download Demo</a>`
+    : "";
+
+  const fullBtn = app.fullUrl
+    ? `<a class="btn primary" href="${app.fullUrl}" download>Buy Full ($${app.price})</a>`
+    : "";
+
   card.innerHTML = `
-    <img class="app-image" src="${app.screenshot || "images/placeholder.png"}">
+    <div class="img-wrapper">
+      <img src="${app.screenshot || 'images/placeholder.png'}"
+           onerror="this.src='images/placeholder.png'">
+    </div>
+
     <h3>${app.name}</h3>
-    <p class="platform">${app.platform}</p>
     <p class="description">${app.description}</p>
+    <p><strong>Platform:</strong> ${app.platform}</p>
 
-    ${renderList("Features", app.features)}
-    ${renderList("Deliverables", app.deliverables)}
+    ${featuresHtml}
 
-    <p class="rating">⭐ ${app.rating}</p>
-    <p class="price">$${app.price}</p>
+    <div class="rating">
+      ${"★".repeat(app.rating || 0)}${"☆".repeat(5 - (app.rating || 0))}
+    </div>
 
     <div class="actions">
-      ${app.demoUrl ? `<a href="${app.demoUrl}" class="btn">Download Demo</a>` : ""}
-      ${app.fullUrl ? `<a href="${app.fullUrl}" class="btn primary">Buy Full</a>` : ""}
+      ${demoBtn}
+      ${fullBtn}
     </div>
   `;
 
-  return card;
-}
-
-function renderList(title, items) {
-  if (!items || items.length === 0) return "";
-
-  return `
-    <h4>${title}</h4>
-    <ul>
-      ${items.map(i => `<li>${i}</li>`).join("")}
-    </ul>
-  `;
+  container.appendChild(card);
 }
