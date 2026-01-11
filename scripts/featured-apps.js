@@ -9,8 +9,9 @@ async function loadFeaturedApps() {
   container.innerHTML = "<p>Loading apps...</p>";
 
   try {
+    // 1. Load index
     const indexRes = await fetch(APPS_INDEX_URL);
-    if (!indexRes.ok) throw new Error("apps-index.json not found");
+    if (!indexRes.ok) throw new Error("Index not found");
 
     const appFiles = await indexRes.json();
 
@@ -19,8 +20,9 @@ async function loadFeaturedApps() {
       return;
     }
 
-    container.innerHTML = "";
+    container.innerHTML = ""; // clear once only
 
+    // 2. Load each app JSON
     for (const file of appFiles) {
       try {
         const appRes = await fetch(`data/${file}`);
@@ -29,7 +31,7 @@ async function loadFeaturedApps() {
         const app = await appRes.json();
         renderAppCard(container, app);
       } catch (err) {
-        console.warn("Failed loading app:", file, err);
+        console.warn("Failed loading", file, err);
       }
     }
   } catch (err) {
@@ -42,32 +44,39 @@ function renderAppCard(container, app) {
   const card = document.createElement("div");
   card.className = "featured-app-card";
 
+  const featuresHtml = Array.isArray(app.features)
+    ? `<ul>${app.features.map(f => `<li>${f}</li>`).join("")}</ul>`
+    : "";
+
+  const demoBtn = app.demoUrl
+    ? `<a class="btn" href="${app.demoUrl}" download>Download Demo</a>`
+    : "";
+
+  const fullBtn = app.fullUrl
+    ? `<a class="btn primary" href="${app.fullUrl}" download>Buy Full ($${app.price})</a>`
+    : "";
+
   card.innerHTML = `
     <div class="img-wrapper">
-      <img src="${app.screenshot || "images/placeholder.png"}"
-           alt="${app.name}"
+      <img src="${app.screenshot || 'images/placeholder.png'}"
            onerror="this.src='images/placeholder.png'">
     </div>
 
     <h3>${app.name}</h3>
-    <p>${app.description}</p>
-
+    <p class="description">${app.description}</p>
     <p><strong>Platform:</strong> ${app.platform}</p>
-    <p><strong>Price:</strong> ${app.price && app.price > 0 ? `$${app.price}` : "Free"}</p>
 
-    ${app.features?.length ? `
-      <h4>Key Features</h4>
-      <ul class="features-list">
-        ${app.features.map(f => `<li>${f}</li>`).join("")}
-      </ul>
-    ` : ""}
-
-    ${app.deliverables?.length ? `
-      <h4>Deliverables</h4>
-      <ul class="deliverables-list">
-        ${app.deliverables.map(d => `<li>${d}</li>`).join("")}
-      </ul>
-    ` : ""}
+    ${featuresHtml}
 
     <div class="rating">
       ${"★".repeat(app.rating || 0)}${"☆".repeat(5 - (app.rating || 0))}
+    </div>
+
+    <div class="actions">
+      ${demoBtn}
+      ${fullBtn}
+    </div>
+  `;
+
+  container.appendChild(card);
+}
