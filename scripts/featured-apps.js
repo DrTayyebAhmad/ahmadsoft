@@ -4,45 +4,58 @@ const APPS_DIR = "/data/";
 document.addEventListener("DOMContentLoaded", loadApps);
 
 async function loadApps() {
+  const container = document.getElementById("featured-apps");
+  container.innerHTML = "<p>Loading apps…</p>";
+
   try {
     const indexRes = await fetch(APPS_INDEX);
-    if (!indexRes.ok) throw new Error("apps-index.json not found");
-
     const files = await indexRes.json();
-
-    const container = document.getElementById("featured-apps");
-    if (!container) {
-      console.error("❌ #featured-apps not found in index.html");
-      return;
-    }
 
     container.innerHTML = "";
 
     for (const file of files) {
       const res = await fetch(APPS_DIR + file);
-      if (!res.ok) continue;
-
       const app = await res.json();
-      renderApp(app, container);
+      container.appendChild(renderApp(app));
     }
-  } catch (err) {
-    console.error("❌ Failed to load apps:", err);
+  } catch (e) {
+    container.innerHTML = "<p>Failed to load apps.</p>";
+    console.error(e);
   }
 }
 
-function renderApp(app, container) {
+function renderApp(app) {
   const card = document.createElement("div");
-  card.className = "app-card";
+  card.className = "featured-app-card";
 
   card.innerHTML = `
-    <img src="${app.screenshot || "images/placeholder.png"}" alt="${app.name}">
+    <img class="app-image" src="${app.screenshot || "images/placeholder.png"}">
     <h3>${app.name}</h3>
-    <p>${app.description}</p>
-    <p><strong>Platform:</strong> ${app.platform}</p>
-    <p><strong>Rating:</strong> ⭐ ${app.rating}</p>
-    <p><strong>Price:</strong> $${app.price}</p>
-    <a href="app.html?id=${app.id}" class="btn">View Details</a>
+    <p class="platform">${app.platform}</p>
+    <p class="description">${app.description}</p>
+
+    ${renderList("Features", app.features)}
+    ${renderList("Deliverables", app.deliverables)}
+
+    <p class="rating">⭐ ${app.rating}</p>
+    <p class="price">$${app.price}</p>
+
+    <div class="actions">
+      ${app.demoUrl ? `<a href="${app.demoUrl}" class="btn">Download Demo</a>` : ""}
+      ${app.fullUrl ? `<a href="${app.fullUrl}" class="btn primary">Buy Full</a>` : ""}
+    </div>
   `;
 
-  container.appendChild(card);
+  return card;
+}
+
+function renderList(title, items) {
+  if (!items || items.length === 0) return "";
+
+  return `
+    <h4>${title}</h4>
+    <ul>
+      ${items.map(i => `<li>${i}</li>`).join("")}
+    </ul>
+  `;
 }
