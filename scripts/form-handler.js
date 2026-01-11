@@ -1,91 +1,53 @@
-document.getElementById("app-form").addEventListener("submit", async function (e) {
-  e.preventDefault();
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("form-handler.js loaded");
 
-  console.log("Form submitted");
+  const form = document.getElementById("app-form");
 
-  const fileInput = document.getElementById("demo-file");
-  const file = fileInput.files[0];
-
-  if (!file) {
-    alert("Please upload an app file.");
+  if (!form) {
+    console.error("❌ app-form not found");
     return;
   }
 
-  console.log("File selected:", file.name);
+  console.log("✅ app-form found");
 
-  try {
-    console.log("Uploading file...");
-    let fileUrl = null;
-    let fileData = null;
-    try {
-      fileUrl = await uploadFile(file);
-      console.log("File uploaded successfully. URL:", fileUrl);
-    } catch (uploadErr) {
-      const readerResult = await readFileAsDataURL(file);
-      fileData = readerResult;
-      console.log("Backend upload failed; stored file to localStorage as base64");
-    }
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    console.log("✅ Submit event triggered");
 
-    const appId = Date.now().toString();
-    const newApp = {
-      id: appId,
+    const app = {
+      id: Date.now().toString(),
       name: document.getElementById("app-name").value,
       platform: document.getElementById("platform").value,
       description: document.getElementById("description").value,
-      hyperlink: document.getElementById("hyperlink").value || null,
-      screenshot: document.getElementById("screenshot").value,
+      features: document.getElementById("features").value
+        .split("\n")
+        .filter(Boolean),
+      deliverables: document.getElementById("deliverables").value
+        .split("\n")
+        .filter(Boolean),
+      hyperlink: document.getElementById("hyperlink").value || "",
+      screenshot:
+        document.getElementById("screenshot").value ||
+        "images/placeholder.png",
       rating: parseFloat(document.getElementById("rating").value),
-      fileName: file.name,
-      fileUrl: fileUrl,
-      fileData: fileData,
+      price: parseFloat(document.getElementById("price").value || "0"),
+      purchaseLink: document.getElementById("purchase-link").value || "",
+      demoUrl: "",
+      fullUrl: ""
     };
 
-    console.log("New App Object:", newApp);
+    console.log("📦 App JSON:", app);
 
-    const apps = JSON.parse(localStorage.getItem("apps")) || [];
-    apps.push(newApp);
-    localStorage.setItem("apps", JSON.stringify(apps));
+    const blob = new Blob([JSON.stringify(app, null, 2)], {
+      type: "application/json"
+    });
 
-    if (fileData) {
-      try {
-        localStorage.setItem(`file_${appId}`, fileData);
-      } catch (e) {
-        console.warn("Failed to store base64 file separately:", e);
-      }
-    }
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${app.name.replace(/\s+/g, "_")}.json`;
+    link.click();
 
-    alert("App submitted successfully!");
-    document.getElementById("app-form").reset();
-    window.location.href = "index.html";
-  } catch (error) {
-    console.error("Error:", error);
-    alert("Failed to submit app. Please try again.");
-  }
+    alert("✅ App JSON generated. Add it to data/apps.json");
+    form.reset();
+  });
 });
-
-async function uploadFile(file) {
-  const formData = new FormData();
-  formData.append("file", file);
-  const response = await fetch("http://localhost:3000/upload", {
-    method: "POST",
-    body: formData,
-  });
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || "Upload failed");
-  }
-  const data = await response.json();
-  if (!data || !data.fileUrl) {
-    throw new Error("Invalid upload response");
-  }
-  return data.fileUrl;
-}
-
-function readFileAsDataURL(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error("File read error"));
-    reader.readAsDataURL(file);
-  });
-}

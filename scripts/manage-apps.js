@@ -40,9 +40,11 @@ function displayApps() {
       <h3>${app.name}</h3>
       <p>${app.description}</p>
       <p><strong>Platform:</strong> ${app.platform}</p>
+      ${app.price && app.price > 0 ? `<p><strong>Price:</strong> $${Number(app.price).toFixed(2)}</p>` : ''}
       <div class="rating">${"★".repeat(Math.floor(app.rating))}${"☆".repeat(5 - Math.floor(app.rating))}</div>
       <div class="app-actions">
-      <button onclick="downloadApp('${app.id}')">Download</button>
+      <button onclick="downloadApp('${app.id}')">Download Demo</button>
+      ${app.price && app.price > 0 ? `<button onclick="downloadFullApp('${app.id}')">Download Full</button>` : ''}
       <button onclick="editApp(${index})">Edit</button>
       <button onclick="deleteApp(${index}, '${app.id}')">Delete</button>
       </div>
@@ -67,7 +69,13 @@ function downloadApp(appId) {
     }
     const fileData = localStorage.getItem(`file_${appId}`);
     if (fileData) {
-      const blob = new Blob([fileData], { type: "application/octet-stream" });
+      const base64Data = fileData.split(",")[1];
+      const binaryString = window.atob(base64Data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: "application/octet-stream" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -84,6 +92,81 @@ function downloadApp(appId) {
   }
 }
 
+async function downloadFullApp(appId) {
+  try {
+    const apps = JSON.parse(localStorage.getItem("apps")) || [];
+    const app = apps.find(a => a.id === appId);
+    if (!app) {
+      alert("App not found");
+      return;
+    }
+    if (app.fullFileUrl) {
+      const a = document.createElement("a");
+      a.href = app.fullFileUrl;
+      a.download = app.fullFileName || `full_${appId}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      return;
+    }
+    const key = app.fullFileKey || `full_${appId}`;
+    const fileData = localStorage.getItem(key);
+    let blob = null;
+    if (fileData) {
+      const base64Data = fileData.split(",")[1];
+      const binaryString = window.atob(base64Data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      blob = new Blob([bytes], { type: "application/octet-stream" });
+    } else {
+      try {
+        const db = await openFilesDB();
+        const tx = db.transaction("files", "readonly");
+        const store = tx.objectStore("files");
+        const req = store.get(key);
+        await new Promise((resolve, reject) => {
+          req.onsuccess = () => {
+            blob = req.result ? req.result.blob : null;
+            resolve();
+          };
+          req.onerror = () => reject(new Error("IndexedDB read error"));
+        });
+      } catch (_) {
+        blob = null;
+      }
+    }
+    if (!blob) {
+      alert("Full version file not found");
+      return;
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = app.fullFileName || `full_${appId}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    alert("Error downloading full file.");
+  }
+}
+
+function openFilesDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("appFiles", 1);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains("files")) {
+        db.createObjectStore("files", { keyPath: "key" });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(new Error("IndexedDB open error"));
+  });
+}
 function editApp(index) {
   localStorage.setItem("editAppIndex", index);
   window.location.href = "submit-app.html";
