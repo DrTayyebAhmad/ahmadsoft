@@ -419,6 +419,10 @@ header .logo {
   text-decoration: none;
 }
 
+.download-btn {
+  color: #ffffff !important;   /* FORCE white text */
+}
+
 /* --- PAID BUTTON --- */
 .paid-btn {
   background: #ff7a00;
