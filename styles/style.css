@@ -343,17 +343,19 @@ footer p span {
 
 /* Download button styles */
 .download-btn {
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background 0.2s;
-    width: 100%;
-    margin-top: 1rem;
+  display: inline-block;
+  background: #28a745;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+  margin-top: 0.6rem;
+  text-align: center;
+  white-space: nowrap;
 }
+
 
 .download-btn:hover {
   background: #218838;
