@@ -1,0 +1,34 @@
+{
+  "id": "1768309920742",
+  "name": "MindGym",
+  "platform": "Android",
+  "description": "MindGym is a mobile-first cognitive fitness platform that transforms mental training into a daily habit—just like physical workouts. Built on neuroscience-backed exercises and adaptive difficulty, MindGym strengthens memory, focus, problem-solving, emotional regulation, and cognitive endurance through short, engaging sessions. MindGym is a robust and well-structured application that effectively combines cognitive science with gamification.",
+  "features": [
+    "Cognitive Training Workouts",
+    "Neuroscience-based exercises with adaptive difficulty:",
+    "Memory (N-Back) – working memory and recall",
+    "Working Memory (Updating) – Active memory & Mental tracking (Full Version)",
+    "Attention (Stroop) – selective attention & cognitive control",
+    "Problem-Solving (Speed Math) – processing speed & logic",
+    "Impulse Control (Go/No-Go) – inhibition & self-regulation (Full Version)",
+    "Impulse Control (Under Pressure) – self-control under pressure (Full Version)",
+    "Spatial Rotation – visual-spatial intelligence (Full Version)",
+    "Dual Tasking – divided attention (Full Version)",
+    "Visual Search – perceptual speed (Full Version)",
+    "Emotional Regulation (Breathing) – stress and arousal control (Full Version)"
+  ],
+  "deliverables": [
+    "Fully responsive mobile-first app",
+    "Offline-friendly local data persistence",
+    "Session-based training ",
+    "Clean, gamified UI/UX",
+    "Modular exercise system"
+  ],
+  "hyperlink": "",
+  "screenshot": "images/preview.png",
+  "rating": 5,
+  "price": 49.99,
+  "purchaseLink": "",
+  "demoUrl": "https://yekydoulfkmfbgcs.public.blob.vercel-storage.com/MindGym%20%E2%80%94%20Cognitive%20Fitness%20Platform_1_1.0_Demo.apk",
+  "fullUrl": "https://yekydoulfkmfbgcs.public.blob.vercel-storage.com/MindGym%20%E2%80%94%20Cognitive%20Fitness%20Platform_1_1.0_Full.apk"
+}
