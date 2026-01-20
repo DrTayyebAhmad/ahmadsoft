@@ -141,21 +141,62 @@ button:hover {
 
 /* Footer */
 footer {
-  background: rgba(255, 255, 255, 0.9);
+  background: #ffffff;
   text-align: center;
-  padding: 1rem;
+  padding:  1rem;
   margin-top: auto;
   box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+footer p .year {
+  color: #E38217; /* light brown */
+  font-weight: 700;
 }
 
 footer p {
   margin: 0;
-  color: #6C63FF;
+  color:  #AA51A9;
+  font-weight: 600;
 }
 
 footer p span {
-  color: #FF6584;
+  color: #0C1911;
+  font-weight: 700;
+}
+
+footer nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+}
+
+footer nav ul li {
+  display: inline-flex;
+  align-items: center;
+}
+
+footer nav ul li + li::before {
+  content: "■";
+  color: #e0e0e0;
+  font-size: 0.6rem;
+  margin: 0 12px;
+}
+
+footer nav ul li a {
+  color: #05A417;
+  text-decoration: none;
   font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+footer nav ul li a:hover {
+  color: #FF6584;
 }
 
 /* Featured Apps Section */
@@ -436,4 +477,3 @@ header .logo {
 #featured-apps {
   min-height: 300px;
 }
-
