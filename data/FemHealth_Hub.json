@@ -1,0 +1,32 @@
+{
+  "id": "1769689310655",
+  "name": "FemHealth Hub",
+  "platform": "Android",
+  "description": "AI-Driven Women’s Health & Femtech Hub is a mobile-first wellness platform offering personalized cycle tracking, fertility insights, menopause support, and pelvic floor exercises. The app combines rule-based AI logic, sensor-enabled guidance, and a supportive community to help women understand their bodies better—safely, privately, and accessibly. It also includes symptom insights, lifestyle recommendations",
+  "features": [
+    "Personalized Cycle & Fertility Tracking",
+    "AI Symptom Checker ",
+    "Menopause Support",
+    "Pelvic Floor Exercises",
+    "BMR & Nutrition Integration",
+    "Calendar Interactivity",
+    "Visualizing Trends",
+    "Hydration Tracker",
+    "Medication/Supplement Reminders",
+    "Dark Mode",
+    "Community Forum"
+  ],
+  "deliverables": [
+    "Rule-based AI logic implementation",
+    "Local data persistence",
+    "Sensor-enabled interaction support",
+    "Clear onboarding and medical disclaimers"
+  ],
+  "hyperlink": "",
+  "screenshot": "images/FemTech.png",
+  "rating": 5,
+  "price": 34.99,
+  "purchaseLink": "",
+  "demoUrl": "",
+  "fullUrl": ""
+}
