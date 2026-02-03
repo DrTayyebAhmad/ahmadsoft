@@ -29,6 +29,6 @@
   "price": 14.99,
   "purchaseLink": "",
   "demoUrl": "https://yekydoulfkmfbgcs.public.blob.vercel-storage.com/Revenge%20Body%20Timer_Demo.apk",
-  "paddleCheckoutUrl": "https://checkout.paddle.com/pay/XXXX"
+  "paddleCheckoutUrl": "https://checkout.paddle.com/pay/XXXX",
   "fullUrl": ""
 }
