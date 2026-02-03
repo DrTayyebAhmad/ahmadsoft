@@ -1,0 +1,33 @@
+{
+  "id": "1770122676787",
+  "name": "Revenge Body Timer",
+  "platform": "Android",
+  "description": "The “Revenge Body Timer” ⏱️ is a goal-oriented web application 🖥️ that leverages psychological motivation 🧠—specifically the desire for a comeback—to drive fitness consistency 💪.\nThe app creates a high-stakes environment ⚠️ where users set a “Revenge Timeline” 📆 to achieve specific physical milestones, such as fat loss 🔥 or muscle gain 🏋️.\nIt utilizes a dark, aggressive cyber-fitness aesthetic 🌌 with neon accents 💠 (cyan and pink) to maintain a sense of urgency and intensity ⚡.\n",
+  "features": [
+    "⏳ Dynamic Revenge Timeline",
+    "Users input a start date and target date",
+    "😈 Vindictive Mode",
+    "🎯 Fitness Goal Customization",
+    "🧍 Silhouette Morphing (Full version) A visual representation of user progress showing “Before” & “After” silhouettes ",
+    "📈 Progress Bar",
+    "🧠 Motivational Engine (Full version)",
+    "🔔 Brutally Honest Notifications (Full version)",
+    "💬 Savage Quotes (Full version)",
+    "✅ Daily Challenges (Full version)",
+    "🌍 Leaderboard & Sharing (Full version)",
+    "🏅 Milestone Badges (Full version)"
+  ],
+  "deliverables": [
+    "Local Storage Persistence",
+    "Provides the semantic layout ",
+    "Includes complex animations ",
+    "Responsive design "
+  ],
+  "hyperlink": "",
+  "screenshot": "images/revenge.jpg",
+  "rating": 5,
+  "price": 14.99,
+  "purchaseLink": "",
+  "demoUrl": "https://yekydoulfkmfbgcs.public.blob.vercel-storage.com/Revenge%20Body%20Timer_Demo.apk",
+  "fullUrl": "https://checkout.paddle.com/pay/XXXX"
+}
