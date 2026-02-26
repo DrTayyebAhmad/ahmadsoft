@@ -1,34 +1,36 @@
 {
   "id": "1770122676787",
   "name": "Revenge Body Timer",
-  "platform": "Android",
-  "description": "The “Revenge Body Timer” ⏱️ is a goal-oriented web application 🖥️ that leverages psychological motivation 🧠—specifically the desire for a comeback—to drive fitness consistency 💪.\nThe app creates a high-stakes environment ⚠️ where users set a “Revenge Timeline” 📆 to achieve specific physical milestones, such as fat loss 🔥 or muscle gain 🏋️.\nIt utilizes a dark, aggressive cyber-fitness aesthetic 🌌 with neon accents 💠 (cyan and pink) to maintain a sense of urgency and intensity ⚡.\n",
+  "platform": "Android & Windows",
+  "description": "The “Revenge Body Timer” is a goal-oriented web application that leverages psychological motivation 🧠 specifically the desire for a comeback—to drive fitness consistency 💪.\nThe app creates a high-stakes environment where users set a timeline to achieve specific physical milestones, such as fat loss 🔥 or muscle gain 🏋️.\nIt utilizes a dark, aggressive cyber-fitness aesthetic 🌌 with neon accents  to maintain a sense of urgency and intensity ⚡.\n",
   "features": [
-    "⏳ Dynamic Revenge Timeline",
-    "Users input a start date and target date",
-    "😈 Vindictive Mode",
-    "🎯 Fitness Goal Customization",
-    "🧍 Silhouette Morphing (Full version) A visual representation of user progress showing “Before” & “After” silhouettes ",
     "📈 Progress Bar",
-    "🧠 Motivational Engine (Full version)",
-    "🔔 Brutally Honest Notifications (Full version)",
-    "💬 Savage Quotes (Full version)",
-    "✅ Daily Challenges (Full version)",
-    "🌍 Leaderboard & Sharing (Full version)",
-    "🏅 Milestone Badges (Full version)"
+	"😈 Vindictive Mode",
+	"🏅 Milestone Badges",
+	"🧠 Motivational Engine",
+	"⏳ Dynamic Revenge Timeline",
+	"🎯 Fitness Goal Customization",
+	"📅 Users input a start date and target date",
+	"🧍 Silhouette Morphing: A visual representation of user progress showing “Before” & “After” silhouettes ",
+    "🛡️ Recovery Guardrails  (Full version)",
+	"🧠 Weekly Coach Summary  (Full version)",
+	"✅ Daily Performance Log (Full version)",
+    "🗂️ Weekly Plan & Milestones (Full version)"
+	    
   ],
   "deliverables": [
+    "Free <b>Demo</b> available on <b>Android</b> only",
+    "<b>Full version</b> available on <b>Android</b> and <b>Windows</b>",
     "Local Storage Persistence",
-    "Provides the semantic layout ",
-    "Includes complex animations ",
-    "Responsive design "
+    "Provides semantic layout includes complex animations & responsive design "
+    
   ],
   "hyperlink": "",
   "screenshot": "images/revenge.jpg",
-  "rating": 5,
+  "rating": 4,
   "price": 14.99,
   "purchaseLink": "",
-  "demoUrl": "https://yekydoulfkmfbgcs.public.blob.vercel-storage.com/Revenge%20Body%20Timer_Demo.apk",
-  "paddleCheckoutUrl": "https://checkout.paddle.com/pay/XXXX",
+  "demoUrl": "https://yekydoulfkmfbgcs.public.blob.vercel-storage.com/Revenge%20Body%20Timer%20Demo.apk ",
+  "paddleCheckoutUrl": "https://drtayyeb.gumroad.com/l/oxgvx",
   "fullUrl": ""
 }

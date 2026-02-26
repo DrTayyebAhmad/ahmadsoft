@@ -1,23 +1,27 @@
 {
   "i'd": "1769689310655",
   "name": "FemHealth Hub",
-  "platform": "Android",
+  "platform": "Android & Windows",
   "description": "AI-Driven Women’s Health & Femtech Hub is a mobile-first wellness platform offering personalized cycle tracking, fertility insights, menopause support, and pelvic floor exercises. The app combines rule-based AI logic, sensor-enabled guidance, and a supportive community to help women understand their bodies better—safely, privately, and accessibly. It also includes symptom insights, lifestyle recommendations",
   "features": [
     "🔄 Personalized Cycle & Fertility Tracking",
-    "🧠 AI Symptom Checker",
-    "⚖️ Menopause Support",
-    "🧘‍♀️ Pelvic Floor Exercises (Full Version)",
-    "🍎 BMR & Nutrition Integration (Full Version)",
+    "📊 Trends dashboard with visual analytics.",
+    "⚖️ Menopause Support Mode",
     "📅 Calendar Interactivity",
-    "📈 Visualizing Trends (Full Version)",
-    "💧 Hydration Tracker (Full Version)",
-    "💊 Medication/Supplement Reminders (Full Version)",
-    "🌙 Dark Mode (Full Version)",
-    "👥 Community Forum"
+	"🧠 AI Symptom Checker",
+	"💊 Medication/Supplement Reminders",
+	"💧 Hydration Tracker (Full Version)",
+	"🧘‍♀️ Pelvic Floor Exercises (Full Version)",
+    "📈 Exercise Monitor actions (Full Version)",
+	"🍎 BMR & Nutrition Integration (Full Version)",
+    "🔒 Privacy Controls with local-first storage",
+    "📄 Provider PDF report export for consultation",
+    "👥 Community Forum including topics & posts"
 
   ],
   "deliverables": [
+    "Free <b>Demo</b> available on <b>Android</b> only",
+    "<b>Full version</b> available on <b>Android</b> and <b>Windows</b>",
     "Rule-based AI logic implementation",
     "Local data persistence",
     "Sensor-enabled interaction support",
@@ -28,7 +32,7 @@
   "rating": 5,
   "price": 34.99,
   "purchaseLink": "",
-  "demoUrl": "https://yekydoulfkmfbgcs.public.blob.vercel-storage.com/FemHealth%20Hub_Demo.apk",
-   "paddleCheckoutUrl": "https://checkout.paddle.com/pay/XXXX",
+  "demoUrl": "https://yekydoulfkmfbgcs.public.blob.vercel-storage.com/FemHealth%20Hub%20Demo.apk ",
+   "paddleCheckoutUrl": "https://drtayyeb.gumroad.com/l/lxfhti",
   "fullUrl": ""
 }

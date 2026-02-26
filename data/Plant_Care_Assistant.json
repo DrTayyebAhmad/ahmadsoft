@@ -1,0 +1,30 @@
+{
+  "id": "1771993824491",
+  "name": "Plant Care Assistant",
+  "platform": "Android & Windows",
+  "description": "Plant Care Assistant is a comprehensive application designed to help plant enthusiasts, home gardeners, and plant parents track and manage the health of their plants. This intuitive digital assistant simplifies plant care by providing tools for monitoring plant health, scheduling care routines, tracking tasks, and diagnosing common plant problems. The application offers a complete ecosystem for plant care management, from tracking watering schedules to diagnosing health issues. Built with a user-friendly interface and plant-themed design, it makes plant care organized, efficient, and accessible to everyone from beginners to experienced gardeners. ",
+  "features": [
+    "<b>Dashboard Overview:</b> Get a quick snapshot of your plant collection, upcoming tasks, and plants needing attention ",
+    "<b>Plant Inventory:</b> Keep track of all your plants with detailed care instructions & watering schedules",
+    "<b>Care Calendar:</b> Schedule recurring care tasks like watering, fertilizing, and pruning",
+    "<b>Task Management:</b> Create and track specific plant care tasks with completion status",
+	"<b>Smart Scheduling:</b> Never miss a watering or care task with our calendar and reminders.",
+	"<b>Health Monitoring:</b> Visual indicators show which plants need immediate attention",
+    "<b>Troubleshoot Tool:</b> Diagnose plant health issues with our guided question-based tool",
+	"<b>Health Algorithms:</b> Automatically determines plant health based on watering patterns"
+  ],
+  "deliverables": [
+    "Free <b>Demo</b> available on <b>Android</b> only",
+    "<b>Full version</b> available on <b>Android</b> and <b>Windows</b>",
+    "Complete Plant Management: Track all your plants in one place with detailed instructions.",
+	"Offline Functionality: All data is stored locally"
+  ],
+  "hyperlink": "",
+  "screenshot": "images/Plantcare.png",
+  "rating": 5,
+  "price": 59.99,
+  "purchaseLink": "",
+  "demoUrl": "https://yekydoulfkmfbgcs.public.blob.vercel-storage.com/Plant%20Care%20Assistant%20Demo.apk",
+  "paddleCheckoutUrl": "https://drtayyeb.gumroad.com/l/uycli",
+  "fullUrl": ""
+}

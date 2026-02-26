@@ -1,0 +1,33 @@
+{
+  "id": "1772007944507",
+  "name": "PetPal",
+  "platform": "Android & Windows",
+  "description": "PetPal is a comprehensive digital assistant designed for pet owners to manage their pets' health, wellness, and daily activities. It serves as a centralized hub where users can track medical history, monitor daily habits, and engage in gamified challenges to ensure their pets stay healthy and active. The application uses a playful, user-friendly interface with features like \"AI Health Tracking\" and a dedicated \"Diseases Information\" database.",
+  "features": [
+    "<b>AI Health & Wellness Tracker:</b> Log daily care activities such as food, exercise, vet visits, and vaccinations with date/time and notes",
+    "<b>Automated Reminders:</b> Notifies owners of upcoming critical events",
+    "<b>Multi-Pet Profile Management:</b> Create and manage multiple pets, switch the active pet",
+    "<b>Pet Profile Editor:</b> Update pet name, breed, age, and photo through a focused popup",
+    "<b>Vet Records Vault:</b> Store vet records with notes and optional file uploads (PDF/image).",
+    "<b>Medication Scheduler & Adherence:</b> Add medication plans with dosage, frequency",
+    "<b>Smart Health Timeline:</b> View recent care events & health signals in timeline feed for active pet",
+    "<b>Pet Symptom Checker:</b> Select symptoms & receive assessment, possible conditions.",
+    "<b>Emergency Vet Finder:</b> Save your location, use GPS, & open nearby 24/7 emergency vet search",
+    "<b>Disease Information Library:</b> Browse detailed dog and cat disease information, including symptoms, diagnosis, treatment, & prevention",
+    "<b>Vaccination Planner:</b> Review dog and cat vaccination schedules and planning notes",
+    "<b>Marketplace:</b> Access useful pet products"
+  ],
+  "deliverables": [
+    "Free <b>Demo</b> available on <b>Android</b> only",
+    "<b>Full version</b> available on <b>Android</b> and <b>Windows</b>",
+    "Multi-View Architecture, Interactive UI Elements"
+  ],
+  "hyperlink": "",
+  "screenshot": "images/pet.png",
+  "rating": 5,
+  "price": 64.99,
+  "purchaseLink": "",
+  "demoUrl": "https://yekydoulfkmfbgcs.public.blob.vercel-storage.com/PetPAl%20Demo.apk",
+  "paddleCheckoutUrl": "https://drtayyeb.gumroad.com/l/suetus",
+  "fullUrl": ""
+}
