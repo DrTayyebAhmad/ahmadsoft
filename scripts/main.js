@@ -40,6 +40,9 @@ async function downloadApp(appId) {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      if (window.AppAnalytics) {
+        window.AppAnalytics.trackDownload(app.name || "Demo App");
+      }
       return;
     }
     const key = app.fileKey || `file_${appId}`;
@@ -72,6 +75,9 @@ async function downloadApp(appId) {
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
+    if (window.AppAnalytics) {
+      window.AppAnalytics.trackDownload(app.name || "Demo App");
+    }
   } catch (e) {
     alert("Error downloading file.");
   }
@@ -115,6 +121,9 @@ async function downloadFull(appId) {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      if (window.AppAnalytics) {
+        window.AppAnalytics.trackDownload(app.name || "Full Version");
+      }
       return;
     }
     const key = app.fullFileKey || `full_${appId}`;
@@ -147,6 +156,9 @@ async function downloadFull(appId) {
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
+    if (window.AppAnalytics) {
+      window.AppAnalytics.trackDownload(app.name || "Full Version");
+    }
   } catch (e) {
     alert("Error downloading full version.");
   }
