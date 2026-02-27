@@ -20,16 +20,52 @@
     <section id="about-content">
       <h2>Refund Policy</h2>
       <div class="about-text">
-       
         <p>All payments for products sold via this website are processed by Gumroad, who acts as the Merchant of Record.</p>
+        <p>Refunds are issued in accordance with Gumroad's refund policy and terms.</p>
+        <p>Any refund requests must be submitted directly to Gumroad and will be handled at Gumroad's sole discretion, in line with their consumer terms and applicable law.</p>
+        <p>For more information about refunds, please refer to Gumroad's official refund policy.</p>
 
-        <p>Refunds are issued in accordance with Gumroad ’s refund policy and terms.</p>
-        <p>Any refund requests must be submitted directly to Gumroad  and will be handled at Gumroad ’s sole discretion, in line with their consumer terms and applicable law.</p>
+        <div id="refund-analytics" class="refund-analytics">
+          <h3>Visitor and Download History</h3>
+          <div class="history-filter">
+            <label for="history-range">Show history:</label>
+            <select id="history-range">
+              <option value="1m" selected>Last 1 month</option>
+              <option value="3m">Last 3 months</option>
+              <option value="6m">Last 6 months</option>
+              <option value="1y">Last 1 year</option>
+              <option value="all">All available</option>
+            </select>
+          </div>
+          <div class="refund-stats">
+            <div class="refund-stat-card">
+              <p class="refund-stat-label">Your Country</p>
+              <p id="visitor-country" class="refund-stat-value">Loading...</p>
+            </div>
+            <div class="refund-stat-card">
+              <p class="refund-stat-label">Total Visits</p>
+              <p id="total-visits" class="refund-stat-value">0</p>
+            </div>
+            <div class="refund-stat-card">
+              <p class="refund-stat-label">Total Visitors</p>
+              <p id="total-visitors" class="refund-stat-value">0</p>
+            </div>
+            <div class="refund-stat-card">
+              <p class="refund-stat-label">Total Downloads</p>
+              <p id="total-downloads" class="refund-stat-value">0</p>
+            </div>
+          </div>
 
-        <p>For more information about refunds, please refer to Gumroad’s official refund policy.</p>
+          <h4>Your Downloads</h4>
+          <ul id="visitor-downloads" class="refund-list">
+            <li>No downloads yet.</li>
+          </ul>
 
-
-       
+          <h4>Recent History</h4>
+          <ul id="analytics-history" class="refund-list">
+            <li>Loading history...</li>
+          </ul>
+        </div>
       </div>
     </section>
   </main>
@@ -44,5 +80,7 @@
     </nav>
     <p>&copy; <span class="year">2025</span> <span>Ahmad Soft</span>. All rights reserved.</p>
   </footer>
+  <script src="scripts/analytics.js"></script>
+  <script src="scripts/refund-analytics.js"></script>
 </body>
 </html>
