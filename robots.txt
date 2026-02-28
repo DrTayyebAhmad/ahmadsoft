@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+Disallow: /login.html
+Disallow: /manage-apps.html
+Disallow: /submit-app.html
+Disallow: /payment-success.html
+
+Sitemap: https://ahmadsoft.vercel.app/sitemap.xml
