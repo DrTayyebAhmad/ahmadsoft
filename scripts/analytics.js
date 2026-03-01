@@ -34,20 +34,36 @@
     return visitorId;
   }
 
+  function inferCountryFromLocale() {
+    try {
+      const locale = navigator.language || "";
+      const region = locale.includes("-") ? locale.split("-")[1].toUpperCase() : "";
+      if (!region) return "Unknown";
+      if (typeof Intl !== "undefined" && typeof Intl.DisplayNames === "function") {
+        const display = new Intl.DisplayNames([locale], { type: "region" }).of(region);
+        return display || region;
+      }
+      return region;
+    } catch (_) {
+      return "Unknown";
+    }
+  }
+
   async function requestCountry() {
     const cached = localStorage.getItem(COUNTRY_KEY);
-    if (cached) return cached;
+    if (cached && cached !== "Unknown") return cached;
 
     try {
       const response = await fetch("https://ipapi.co/json/", { cache: "no-store" });
       if (!response.ok) throw new Error("country lookup failed");
       const data = await response.json();
-      const country = data.country_name || "Unknown";
+      const country = data.country_name || inferCountryFromLocale();
       localStorage.setItem(COUNTRY_KEY, country);
       return country;
     } catch (_) {
-      localStorage.setItem(COUNTRY_KEY, "Unknown");
-      return "Unknown";
+      const fallbackCountry = inferCountryFromLocale();
+      localStorage.setItem(COUNTRY_KEY, fallbackCountry);
+      return fallbackCountry;
     }
   }
 
