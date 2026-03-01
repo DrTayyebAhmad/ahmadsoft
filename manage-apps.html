@@ -25,6 +25,53 @@
     <section id="app-grid">
       <!-- Apps will be dynamically loaded here -->
     </section>
+    <section id="about-content">
+      <h2>Visitor and Download History</h2>
+      <div class="about-text">
+        <div id="refund-analytics" class="refund-analytics">
+          <div class="history-filter">
+            <label for="history-range">Show history:</label>
+            <select id="history-range">
+              <option value="today">Today</option>
+              <option value="1w">Last week</option>
+              <option value="1m" selected>Last 1 month</option>
+              <option value="3m">Last 3 months</option>
+              <option value="6m">Last 6 months</option>
+              <option value="1y">Last 1 year</option>
+              <option value="all">All available</option>
+            </select>
+          </div>
+          <div class="refund-stats">
+            <div class="refund-stat-card">
+              <p class="refund-stat-label">Your Country</p>
+              <p id="visitor-country" class="refund-stat-value">Loading...</p>
+            </div>
+            <div class="refund-stat-card">
+              <p class="refund-stat-label">Total Visits</p>
+              <p id="total-visits" class="refund-stat-value">0</p>
+            </div>
+            <div class="refund-stat-card">
+              <p class="refund-stat-label">Total Visitors</p>
+              <p id="total-visitors" class="refund-stat-value">0</p>
+            </div>
+            <div class="refund-stat-card">
+              <p class="refund-stat-label">Total Downloads</p>
+              <p id="total-downloads" class="refund-stat-value">0</p>
+            </div>
+          </div>
+
+          <h4>Your Downloads</h4>
+          <ul id="visitor-downloads" class="refund-list">
+            <li>No downloads yet.</li>
+          </ul>
+
+          <h4>History</h4>
+          <ul id="analytics-history" class="refund-list">
+            <li>Loading history...</li>
+          </ul>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer>
@@ -40,6 +87,8 @@
   </footer>
 
   
+  <script src="scripts/analytics.js"></script>
   <script src="scripts/manage-apps.js"></script>
+  <script src="scripts/manage-analytics.js"></script>
 </body>
 </html>
